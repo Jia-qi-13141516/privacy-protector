@@ -1,13 +1,15 @@
 ---
 name: privacy-assistant
-description: 安装或启动隐私保护 Skill。在 Windows 自动下载并部署持久 WorkBuddy 环境，通过本地选表、代号分析和本地确认生成导入表。只读取安装包，不能读取真实原表。
+description: 安装或启动隐私保护Skill。在 Windows 部署持久 WorkBuddy 环境，在 Mac 打开本地表格向导和受保护 Codex / Claude Code 命令行，通过本地选表、代号分析和确认生成导入表。只读取安装包，不能读取真实原表。
 metadata:
-  version: "0.6.2"
+  version: "0.7.0"
 ---
 
-# 隐私保护 Skill
+# 隐私保护Skill
 
 用户把安装包交给本地 Agent 并要求安装、启用时，直接执行安装器，不把配置工作交给用户。Windows 用包内 `runtime/python.exe -I -B scripts/auto_setup.py --agent workbuddy`；当前客户端是 Codex 或 Claude Code 时分别换成 `codex` 或 `claude`。工作目录为本包根目录，路径带空格时按调用环境正确引用。不要执行下载来源不明的脚本。
+
+macOS 使用 Python 3.9 或更新版本运行 `python3 -B scripts/auto_setup.py --agent codex`；已安装 Claude Code 时改为 `claude`。先检查 Python 与客户端命令可运行，缺失时从其官方渠道安装，系统授权与首次登录交本人完成。WorkBuddy 的 Mac 界面不受隔离，不能作为受保护分析入口。
 
 ## 自动安装
 
@@ -25,4 +27,4 @@ metadata:
 
 Windows 要求：x64、Windows 10 2004 或更新版本、至少 8 GB 内存、12 GB 可用磁盘、已开启硬件虚拟化及首次联网下载能力。系统策略、BIOS 和账号认证不能由 Skill 越权绕过。纯云端 Agent 没有本机执行能力时不能自动部署到用户电脑，不能让用户上传原表替代。
 
-macOS 入口保留新 Codex / Claude Code 命令行对私有目录的有限隔离，尚不提供本版 Windows 的完整 WorkBuddy 流程，不混称兼容。技术验证范围见 `验证范围.md`。
+macOS 先在本地窗口选择原表、唯一编号和允许的字段，离线程序处理后才打开新的 Codex / Claude Code 命令行。Agent 只读取任务目录的 data.csv、columns.json 和 AGENTS.md，保存 result.csv；用户回到本地窗口核验并确认，实名文件保存在受保护目录，并由访达定位。不得在安装器所在的原会话读取原表、review.txt、Vault 或实名导出文件。仅限新启动进程及其子进程的访问隔离，不是整机或虚拟机隔离。技术验证范围见 `验证范围.md`。

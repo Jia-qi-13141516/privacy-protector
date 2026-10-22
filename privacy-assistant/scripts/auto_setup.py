@@ -89,7 +89,7 @@ def run(agent, launch=True, base=None, skill_home=None):
     if launched.get('status') != 'isolation_launcher_opened':
         receipt.update(status='blocked', code=launched.get('code', 'launch_failed'))
     else:
-        receipt.update(status='new_cli_launcher_opened')
+        receipt.update(status='local_table_window_started')
     put_json(state, receipt)
     return receipt
 

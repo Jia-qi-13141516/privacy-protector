@@ -9,7 +9,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parent))
 import tempfile
 
 
-def profile(vault):
+def profile(vault, protected=(), readonly=()):
     p=json.dumps(str(vault.resolve()),ensure_ascii=False)
     return '\n'.join(['(version 1)', '(allow default)',
         '(deny file-read* file-write* (subpath '+p+'))',
@@ -18,7 +18,9 @@ def profile(vault):
         '(deny network-outbound (remote ip "localhost:*"))',
         '(deny network-outbound (remote unix-socket))',
         # Narrow OS DNS socket exception; never allow general local tool bridges.
-        '(allow network-outbound (literal "/private/var/run/mDNSResponder"))'])
+        '(allow network-outbound (literal "/private/var/run/mDNSResponder"))'] +
+        ['(deny file-read* file-write* (literal ' + json.dumps(str(Path(x).resolve()),ensure_ascii=False) + '))' for x in protected] +
+        ['(deny file-write* (subpath ' + json.dumps(str(Path(x).resolve()),ensure_ascii=False) + '))' for x in readonly])
 
 
 def paths(vault, exchange):

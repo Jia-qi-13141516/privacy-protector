@@ -1,6 +1,6 @@
 {
   "name": "privacy-assistant",
-  "version": "0.6.2",
+  "version": "0.7.0",
   "description": "本地隐私助手：自动部署持久隔离环境，原表本地处理，代号分析后本地回填。",
   "skills": "./skills/"
 }

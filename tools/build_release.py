@@ -3,7 +3,7 @@ import ast,hashlib,json,shutil,zipfile,argparse
 parser=argparse.ArgumentParser();parser.add_argument("--archive",action="store_true");args=parser.parse_args()
 base=Path(__file__).resolve().parents[1]
 (base/'dist').mkdir(exist_ok=True)
-archive=base/'dist/privacy-assistant-0.6.2-windows-x64.zip'
+archive=base/'dist/privacy-assistant-0.7.0.zip'
 r=base/'privacy-assistant'
 for name in ('LICENSE','LICENSE-CC-BY-4.0','NOTICE','LICENSING.md','THIRD_PARTY_NOTICES.md'):
  shutil.copy2(base/name,r/name)
@@ -30,13 +30,13 @@ core_files={str(p.relative_to(r/'skill')):hashlib.sha256(p.read_bytes()).hexdige
 for p in r.rglob('__pycache__'):shutil.rmtree(p)
 for p in (r/'scripts').glob('*.py'):ast.parse(p.read_text())
 files={str(p.relative_to(r)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(r.rglob('*')) if p.is_file() and p.name!='release.json' and '__pycache__' not in p.parts}
-(r/'release.json').write_text(json.dumps({'version':'0.6.2','files':files},indent=2))
+(r/'release.json').write_text(json.dumps({'version':'0.7.0','files':files},indent=2))
 if args.archive:
  with zipfile.ZipFile(archive,'w',zipfile.ZIP_DEFLATED) as z:
   for p in sorted(r.rglob('*')):
    if not p.is_file() or '__pycache__' in p.parts:continue
    info=zipfile.ZipInfo('privacy-assistant/'+str(p.relative_to(r)),(2000,1,1,0,0,0));info.compress_type=zipfile.ZIP_DEFLATED;info.external_attr=(0o100755 if p.suffix in ('.command',) else 0o100644)<<16
    z.writestr(info,p.read_bytes())
- print(json.dumps({'plugin_version':'0.6.2','files':len(files)+1,'zip_mb':round(Path(archive).stat().st_size/1024**2,1)}))
+ print(json.dumps({'plugin_version':'0.7.0','files':len(files)+1,'zip_mb':round(Path(archive).stat().st_size/1024**2,1)}))
 else:
- print(json.dumps({"source_version":"0.6.2","files":len(files)+1,"release_qualified":False,"archive_created":False}))
+ print(json.dumps({"source_version":"0.7.0","files":len(files)+1,"release_qualified":False,"archive_created":False}))

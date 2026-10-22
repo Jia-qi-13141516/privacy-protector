@@ -14,7 +14,7 @@ ROOT=Path(__file__).resolve().parents[1]
 CORE=ROOT/'skill'
 sys.path.insert(0,str(CORE/'scripts'))
 sys.path.insert(0,str(ROOT/'runtime/Lib/site-packages'))
-VERSION='0.6.2'
+VERSION='0.7.0'
 AGENTS=('workbuddy','codex','claude')
 
 
@@ -52,8 +52,8 @@ def doctor():
     local=sys.platform in ('darwin','win32')
     report={'version':VERSION,'local_desktop':local,'installed_means_isolated':False,
       'raw_data_access_requested':False,'windows_device_validated':False,
-      'current_agent_isolated':False,'table_wizard_available':sys.platform=='win32',
-      'configuration_files_required_from_teacher':sys.platform!='win32'}
+      'current_agent_isolated':False,'table_wizard_available':local,
+      'configuration_files_required_from_teacher':False}
     if not local:report.update(status='blocked',code='local_desktop_required');return report
     try:check_package()
     except Exception:report.update(status='blocked',code='package_check_failed');return report
@@ -170,14 +170,11 @@ def start(agent=None,show_ui=True,base=None):
     if agent=='workbuddy':return {'status':'blocked','code':'mac_workbuddy_gui_not_isolated','current_agent_isolated':False}
     binary=shutil.which(agent)
     if binary is None:return {'status':'blocked','code':'agent_not_installed','current_agent_isolated':False}
-    import shlex
-    args=[sys.executable,str(CORE/'scripts/agent_boundary.py'),'--vault',str(base/'Vault'),'--exchange',str(base/'Exchange'),'--',binary]
-    if agent=='claude':args+=['--plugin-dir',str(ROOT)]
-    # Open a new terminal, not an existing session. The command still enters the OS boundary.
-    command=shlex.join(args)
-    script='on run argv\ntell application "Terminal"\nactivate\ndo script (item 1 of argv)\nend tell\nend run'
-    r=subprocess.run(['/usr/bin/osascript','-e',script,command],capture_output=True,text=True)
-    if r.returncode:raise ValueError('terminal_open_failed')
+    installed=base/'App'/VERSION
+    app=installed if (installed/'scripts/mac_workflow.py').is_file() else ROOT
+    subprocess.Popen([sys.executable,'-B',str(app/'scripts/mac_workflow.py'),agent],
+                     stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,
+                     start_new_session=True,close_fds=True)
     return {'status':'isolation_launcher_opened','runtime_isolation_verified':False,'current_agent_isolated':False}
 
 
