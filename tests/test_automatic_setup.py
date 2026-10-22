@@ -55,6 +55,7 @@ class Setup(unittest.TestCase):
         self.assertEqual(other.read_text(),'{}');self.assertFalse((self.base/'App').exists())
     def test_real_mac_cli_canary(self):
         if sys.platform!='darwin':self.skipTest('macOS required')
+        if setup.assistant.shutil.which('codex') is None:self.skipTest('local Codex CLI required for live probe')
         result=self.install()
         self.assertEqual(result['status'],'cli_boundary_verified')
         self.assertFalse(result['persistent_session_verified'])
