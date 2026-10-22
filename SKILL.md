@@ -2,7 +2,7 @@
 name: privacy-assistant
 description: 下载并安装隐私保护 Skill，或打开已安装的本地助手。只读取安装包，原始表格必须由本地窗口选择。
 metadata:
-  version: "0.6.1"
+  version: "0.6.2"
 ---
 
 # 隐私保护 Skill

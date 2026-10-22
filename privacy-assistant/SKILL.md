@@ -2,7 +2,7 @@
 name: privacy-assistant
 description: 安装或启动隐私保护 Skill。在 Windows 自动下载并部署持久 WorkBuddy 环境，通过本地选表、代号分析和本地确认生成导入表。只读取安装包，不能读取真实原表。
 metadata:
-  version: "0.6.1"
+  version: "0.6.2"
 ---
 
 # 隐私保护 Skill

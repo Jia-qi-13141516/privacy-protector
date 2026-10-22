@@ -4,13 +4,13 @@
 
 适用于需要处理名单、统计数据和导入表的教师与行政人员。原表在本地转换为代号数据，AI 完成分析后，再由本地程序回填身份，生成 Excel 文件。
 
-[下载安装包](https://github.com/Jiaqi-Guo-0114/privacy-assistant/releases/tag/v0.6.1) · [支持范围](docs/compatibility.md)
+[下载安装包](https://github.com/Jiaqi-Guo-0114/privacy-assistant/releases/tag/v0.6.2) · [支持范围](docs/compatibility.md)
 
 > 当前为预发布版本。Windows x64 完整流程尚未实机验收，请先用虚构表格试用。
 
 ## 开始使用
 
-下载 Release 中的 **`privacy-assistant-0.6.1-windows-x64.zip`**，交给能在本机执行操作的 Agent，发送：
+下载 Release 中的 **`privacy-assistant-0.6.2-windows-x64.zip`**，交给能在本机执行操作的 Agent，发送：
 
 > 请安装并打开这个隐私保护 Skill。只读取安装包，原表由本地窗口选择。
 
@@ -64,6 +64,6 @@ flowchart LR
 
 ## 许可证与反馈
 
-项目代码采用 [MIT License](LICENSE)。第三方组件保留各自许可证，见[第三方说明](THIRD_PARTY_NOTICES.md)。
+代码采用 [Apache 2.0](LICENSE)，原创文档、Skill 指令文字与流程图采用 [CC BY 4.0](LICENSE-CC-BY-4.0)。署名与适用范围见[许可说明](LICENSING.md)；第三方组件保留各自许可证。
 
 [报告问题](https://github.com/Jiaqi-Guo-0114/privacy-assistant/issues)时，请使用虚构样例，不要附学生资料、账号凭据或身份映射。源码构建方法见[开发说明](docs/development.md)。

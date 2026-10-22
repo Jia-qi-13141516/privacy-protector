@@ -2,7 +2,7 @@
 name: privacy-assistant
 description: 安装或打开隐私保护 Skill。自动配置后台组件，只接收安装包，原始表格由本地窗口选择。
 metadata:
-  version: "0.6.1"
+  version: "0.6.2"
 ---
 
 # 隐私保护 Skill

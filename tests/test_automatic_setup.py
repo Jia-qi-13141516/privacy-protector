@@ -30,7 +30,7 @@ class Setup(unittest.TestCase):
         self.assertFalse(second['release_qualified'])
     def test_previous_receipt_never_skips_live_probe(self):
         self.base.mkdir();(self.base/'Settings').mkdir()
-        ch.put_json(self.base/'Settings/automatic-setup.json',{'version':'0.6.1','agent':'codex','status':'ready','release_qualified':True})
+        ch.put_json(self.base/'Settings/automatic-setup.json',{'version':'0.6.2','agent':'codex','status':'ready','release_qualified':True})
         with patch.object(setup,'probe',return_value={'status':'blocked','code':'isolation_probe_failed'}) as probe,patch.object(setup.assistant,'start') as launch:
             result=setup.run('codex',True,self.base,self.home)
         probe.assert_called_once();launch.assert_not_called()

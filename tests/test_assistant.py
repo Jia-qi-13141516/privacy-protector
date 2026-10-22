@@ -101,7 +101,7 @@ class Package(unittest.TestCase):
         rows=[{'x':Decimal(x),'y':Decimal(y)} for x,y in [(1,1),(2,3),(3,2)]]
         result=w.d.stats(rows,[{'kind':'number','output':'x'},{'kind':'number','output':'y'}])
         self.assertAlmostEqual(result['correlations']['x__y']['r'],0.5,places=14)
-    def test_release_integrity(self):self.assertEqual(a.check_package()['version'],'0.6.1')
+    def test_release_integrity(self):self.assertEqual(a.check_package()['version'],'0.6.2')
     def test_no_personal_paths_in_authored_files(self):
         for folder in ('scripts','skills'):
             for p in (ROOT/folder).rglob('*'):
