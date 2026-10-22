@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "assets": {
+    "python": {
+      "url": "https://api.nuget.org/v3-flatcontainer/python/3.12.10/python.3.12.10.nupkg",
+      "sha256": "0eb85c2dfccccf1b17352de4c397f69194035b7d37149eacc16f1147d93de3b8",
+      "max_bytes": 30000000,
+      "file": "python.3.12.10.nupkg"
+    },
+    "openpyxl": {
+      "url": "https://files.pythonhosted.org/packages/c0/da/977ded879c29cbd04de313843e76868e6e13408a94ed6b987245dc7c8506/openpyxl-3.1.5-py2.py3-none-any.whl",
+      "sha256": "5282c12b107bffeef825f4617dc029afaf41d0ea60823bbb665ef3079dc79de2",
+      "max_bytes": 5000000,
+      "file": "openpyxl-3.1.5-py2.py3-none-any.whl"
+    },
+    "et_xmlfile": {
+      "url": "https://files.pythonhosted.org/packages/c1/8b/5fe2cc11fee489817272089c4203e679c63b570a5aaeb18d852ae3cbba6a/et_xmlfile-2.0.0-py3-none-any.whl",
+      "sha256": "7a91720bc756843502c3b7504c77b8fe44217c85c537d85037f0f536151b2caa",
+      "max_bytes": 5000000,
+      "file": "et_xmlfile-2.0.0-py3-none-any.whl"
+    },
+    "pycdlib": {
+      "url": "https://files.pythonhosted.org/packages/0c/dd/95557c0e3bad0e8ba10c0f17d9deffb139b106eda528a744e544799cbbfb/pycdlib-1.14.0-py2.py3-none-any.whl",
+      "sha256": "a905827335f0066af3fd416c5cf9b1f29dffaf4d0914b714555213d1809f38d4",
+      "max_bytes": 5000000,
+      "file": "pycdlib-1.14.0-py2.py3-none-any.whl"
+    }
+  }
+}

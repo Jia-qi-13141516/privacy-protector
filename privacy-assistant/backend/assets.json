@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "assets": {
+    "virtualbox_windows": {
+      "url": "https://download.virtualbox.org/virtualbox/7.2.22/VirtualBox-7.2.22-175245-Win.exe",
+      "sha256": "afd0ff1656cbe04ed88ce619594ae021419d97cce89fa9bdc443e9a963f1713f",
+      "max_bytes": 250000000
+    },
+    "ubuntu_disk": {
+      "url": "https://cloud-images.ubuntu.com/releases/noble/release-20261017/ubuntu-24.04-server-cloudimg-amd64.vmdk",
+      "sha256": "9a1e3959c9f4ad9d4752101fd4ff9a43191fb7d72e61fa20e033f9fd235ce794",
+      "max_bytes": 1500000000
+    },
+    "workbuddy": {
+      "url": "https://download.codebuddy.cn/workbuddy/saas/linux-x64-deb/WorkBuddy-linux-x64-deb-5.6.2.40046327-c7b525f3.deb",
+      "sha256": "12149ad8c0cd748fd5062d8f62c7827d688d8095427ada99b1ae9e7019897523",
+      "max_bytes": 600000000
+    },
+    "vc_redist": {
+      "url": "https://download.visualstudio.microsoft.com/download/pr/990c720a-46ce-4dc7-87b9-c2eb615d34b9/CC0FF0EB1DC3F5188AE6300FAEF32BF5BEEBA4BDD6E8E445A9184072096B713B/VC_redist.x64.exe",
+      "sha256": "cc0ff0eb1dc3f5188ae6300faef32bf5beeba4bdd6e8e445a9184072096b713b",
+      "max_bytes": 50000000
+    }
+  }
+}
