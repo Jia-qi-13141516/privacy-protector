@@ -37,3 +37,13 @@ python3 -m unittest discover -s tests -p 'test_persistent_backend.py' -v
 - `tools/`：依赖锁定和发布包构建。
 
 更改程序内容后应增加版本号并重新构建文件清单，避免同一版本出现不同内容。包内散列用于发现文件损坏或变化，不替代发布者身份验证。
+
+## 重现首页演示
+
+在 macOS 上准备包内表格依赖及 Pillow，运行：
+
+```sh
+python3 tools/build_readme_demo.py
+```
+
+脚本现场生成 60 条虚构记录，调用本地离线处理程序，按固定规则模拟 Agent 结果，核对筛选、身份回填和原表完整性，再生成首页 GIF、静态结果图与核验记录。它不调用云端模型，也不读取业务资料。图中文字使用系统字体 Hiragino Sans GB。

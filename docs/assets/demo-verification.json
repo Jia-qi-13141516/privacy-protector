@@ -1,0 +1,68 @@
+{
+  "input_records": 60,
+  "selected_records": 21,
+  "raw_score_sum": 1644,
+  "deidentified_score_sum": 1644,
+  "identity_and_result_match": true,
+  "original_unchanged": true,
+  "model_called": false,
+  "method": "macOS offline worker; deterministic rule simulates Agent output",
+  "rule": "score >= 30; follow_up = yes; priority = 2",
+  "raw_sample": [
+    [
+      "000010",
+      "虚构学生10",
+      30,
+      "虚构备注（不提供）"
+    ],
+    [
+      "000011",
+      "虚构学生11",
+      31,
+      "虚构备注（不提供）"
+    ],
+    [
+      "000012",
+      "虚构学生12",
+      32,
+      "虚构备注（不提供）"
+    ]
+  ],
+  "safe_sample": [
+    {
+      "person": "p_04e70681189276d493b0bbc3f613b5fa",
+      "measure_3": "30"
+    },
+    {
+      "person": "p_7dadad6d40cabd5fc5c939ab13bd6475",
+      "measure_3": "31"
+    },
+    {
+      "person": "p_b081b9943f8006a5c6025935f01f89bf",
+      "measure_3": "32"
+    }
+  ],
+  "result_sample": [
+    [
+      "000010",
+      "虚构学生10",
+      "30",
+      "需跟进",
+      2
+    ],
+    [
+      "000011",
+      "虚构学生11",
+      "31",
+      "需跟进",
+      2
+    ],
+    [
+      "000012",
+      "虚构学生12",
+      "32",
+      "需跟进",
+      2
+    ]
+  ]
+}
