@@ -24,7 +24,9 @@ def worker(mode, task):
     except (ValueError, TypeError):
         raise ValueError('local_processing_failed') from None
     if result.returncode or reply != {'status': 'local_ready'}:
-        raise ValueError('local_processing_failed')
+        from document_engine import ERROR_MESSAGES
+        code=reply.get('code') if isinstance(reply,dict) else None
+        raise ValueError(code if code in ERROR_MESSAGES else 'local_processing_failed')
 
 
 def clean_env():
@@ -64,7 +66,7 @@ def pick_agent(requested):
     return choose('Mac 版在新的命令行窗口处理代号数据。请选择已登录的客户端。', available)
 
 
-def launch_agent(agent, task, exchange, base):
+def launch_agent(agent, task, exchange, base, document=False):
     import agent_boundary
     # Local metadata stays inside Vault. Deny both the selected original and
     # private copies; prevent the child from modifying worker code/settings.
@@ -76,6 +78,8 @@ def launch_agent(agent, task, exchange, base):
     ch.write(profile_path, profile.encode())
     prompt = ('在当前目录处理 data.csv。先阅读 AGENTS.md 和 columns.json，向用户询问本次任务。'
               '仅处理代号数据；结果保存为 result.csv，完成后请用户回到隐私保护Skill窗口确认。')
+    if document:
+        prompt = '先阅读 AGENTS.md，再询问用户摘要、改写或整理任务；仅处理 document.txt，结果保存为 result.txt。不要读取任务目录外的文件。'
     args = ['/usr/bin/sandbox-exec', '-f', str(profile_path), shutil.which(agent)]
     if agent == 'codex':
         args += ['--cd', str(exchange), prompt]
@@ -101,7 +105,7 @@ def export_confirmed(task, destination):
     ch.write(destination, data, exclusive=True)
 
 
-def run(agent, base):
+def run_table(agent, base):
     import assistant
     assistant.check_package()
     agent = pick_agent(agent)
@@ -171,18 +175,30 @@ After saving, tell the user to return to the local Skill window for review.\n'''
     assistant.notify('导入文件已生成，访达已显示文件位置。请自行导入业务系统；不要拖进聊天。')
 
 
+def run(agent, base, feature=None):
+    if feature is None:
+        selected=choose('选择这次要处理的材料。原文件只在本地窗口选择。',['表格保护：统计、筛选与回填','文档保护：摘要、改写与整理'])
+        feature='table' if selected.startswith('表格') else 'document'
+    if feature=='table':return run_table(agent,base)
+    if feature=='document':
+        from document_mac import run as run_document
+        return run_document(agent,base)
+    raise ValueError('feature_invalid')
+
+
 def main():
     try:
         import assistant
         if sys.platform != 'darwin':
             raise ValueError('mac_required')
         os.umask(0o077)
-        run(sys.argv[1] if len(sys.argv) > 1 else 'codex', assistant.initialise())
+        run(sys.argv[1] if len(sys.argv) > 1 else 'codex', assistant.initialise(), sys.argv[2] if len(sys.argv)>2 else None)
         return 0
     except Exception as exc:
         import assistant
         if str(exc) != 'cancelled':
-            assistant.notify('本次处理未完成，未向 AI 提供新的原表。请检查文件、字段选择或客户端是否可用，再重试。')
+            from document_engine import ERROR_MESSAGES
+            assistant.notify(ERROR_MESSAGES.get(str(exc),'本次处理未完成，未向 AI 提供新的原始内容。请检查文件、字段选择或客户端是否可用，再重试。'))
         return 2
 
 

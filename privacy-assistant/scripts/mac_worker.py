@@ -29,7 +29,24 @@ def execute(mode, task):
         w.d.isolation_check()
     w.d.safe_path(task)
     private = task / 'private'
-    if mode == 'ingest':
+    if mode.startswith('document_'):
+        import document_engine as doc
+        if mode == 'document_prepare':
+            request=ch.get_json(private/'input.json',1024*1024)
+            source=Path(request['source'])
+            doc.prepare(task,ch.read(source,doc.MAX_INPUT),source.suffix.lower(),request['terms'])
+        elif mode == 'document_approve':
+            request=ch.get_json(private/'approval.json',2*1024*1024)
+            doc.approve(task,request['text'],request['sha256'])
+        elif mode == 'document_preview':
+            request=ch.get_json(private/'result-options.json')
+            doc.preview(task,ch.read(private/'returned.txt',1024*1024).decode('utf-8-sig'),request['restore'])
+        elif mode == 'document_export':
+            request=ch.get_json(private/'export-options.json')
+            data=doc.export(task,request['sha256'],request['extension'])
+            ch.write(private/('final'+request['extension']),data,True)
+        else:raise ValueError('mode_invalid')
+    elif mode == 'ingest':
         source = Path(ch.get_json(private / 'input.json')['source'])
         w.d.require(source.suffix.lower() in ('.csv', '.xlsx'), 'input_rejected')
         ch.write(private / ('original' + source.suffix.lower()), ch.read(source), exclusive=True)
@@ -63,8 +80,11 @@ def main():
         execute(sys.argv[1], Path(sys.argv[2]))
         print('{"status":"local_ready"}')
         return 0
-    except Exception:
-        print('{"status":"blocked"}')
+    except Exception as exc:
+        from document_engine import ERROR_MESSAGES
+        reply={'status':'blocked'}
+        if str(exc) in ERROR_MESSAGES:reply['code']=str(exc)
+        print(json.dumps(reply))
         return 2
 
 

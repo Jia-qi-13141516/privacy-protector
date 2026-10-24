@@ -5,7 +5,7 @@
 | 内容 | 许可证 |
 | --- | --- |
 | 本项目原创的程序、脚本、配置、测试及文档内代码示例 | [Apache License 2.0](LICENSE) |
-| 本项目原创的 Markdown 说明文字、Skill 指令文字、教程与流程图 | [CC BY 4.0](LICENSE-CC-BY-4.0) |
+| 本项目原创的 Markdown 说明文字、Skill 指令文字、教程、流程图与演示动画 | [CC BY 4.0](LICENSE-CC-BY-4.0) |
 | 第三方组件、引用内容和随附的许可证文本 | 各自原有条款；见[第三方说明](THIRD_PARTY_NOTICES.md) |
 
 文档复用时，请注明 **Privacy Assistant contributors**、[项目链接](https://github.com/Jiaqi-Guo-0114/privacy-assistant)、[CC BY 4.0 协议链接](https://creativecommons.org/licenses/by/4.0/)，并说明是否作了修改。项目维护者为 **Jiaqi-Guo-0114**。上述署名不表示原作者为衍生作品背书。

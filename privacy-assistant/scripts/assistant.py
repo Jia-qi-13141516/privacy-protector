@@ -14,7 +14,7 @@ ROOT=Path(__file__).resolve().parents[1]
 CORE=ROOT/'skill'
 sys.path.insert(0,str(CORE/'scripts'))
 sys.path.insert(0,str(ROOT/'runtime/Lib/site-packages'))
-VERSION='0.7.0'
+VERSION='0.8.0'
 AGENTS=('workbuddy','codex','claude')
 
 
@@ -52,7 +52,7 @@ def doctor():
     local=sys.platform in ('darwin','win32')
     report={'version':VERSION,'local_desktop':local,'installed_means_isolated':False,
       'raw_data_access_requested':False,'windows_device_validated':False,
-      'current_agent_isolated':False,'table_wizard_available':local,
+      'current_agent_isolated':False,'table_wizard_available':local,'document_wizard_available':local,
       'configuration_files_required_from_teacher':False}
     if not local:report.update(status='blocked',code='local_desktop_required');return report
     try:check_package()

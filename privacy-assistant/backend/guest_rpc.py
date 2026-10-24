@@ -16,6 +16,18 @@ def offline(request):
     d=wizard.d;d.isolation_check()
     identifier=task_id(request.get('id'));task=TASKS/identifier
     action=request.get('action');private=task/'private'
+    if action.startswith('document_'):
+        import document_engine as doc
+        if action=='document_prepare' and set(request)=={'action','id','extension','data','terms'}:
+            if task.exists():raise ValueError('existing_task')
+            return doc.prepare(task,decode_blob(request['data']),request['extension'],request['terms'])
+        if action=='document_approve' and set(request)=={'action','id','text','sha256'}:
+            return {'data':base64.b64encode(doc.approve(task,request['text'],request['sha256']).encode()).decode()}
+        if action=='document_preview' and set(request)=={'action','id','data','restore'}:
+            return {'text':doc.preview(task,decode_blob(request['data']).decode('utf-8-sig'),request['restore'])}
+        if action=='document_export' and set(request)=={'action','id','sha256','extension'}:
+            return {'data':base64.b64encode(doc.export(task,request['sha256'],request['extension'])).decode()}
+        raise ValueError('invalid_request')
     if action=='input' and set(request)=={'action','id','extension','data'}:
         if request['extension'] not in ('.csv','.xlsx'):raise ValueError('invalid_extension')
         if task.exists():raise ValueError('existing_task')
@@ -72,6 +84,8 @@ def main():
         # Only a small fixed code set crosses the control channel.
         known={'isolation_failed','small_group','category_unknown','policy_invalid','active_content',
                'result_mismatch','duplicate_identity','unauthorized_change','numeric_invalid','job_mismatch'}
+        from document_engine import ERROR_MESSAGES
+        known.update(ERROR_MESSAGES)
         return {'error':str(error) if str(error) in known else 'local_operation_failed'}
 
 if __name__=='__main__':

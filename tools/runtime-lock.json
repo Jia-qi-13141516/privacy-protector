@@ -24,6 +24,12 @@
       "sha256": "a905827335f0066af3fd416c5cf9b1f29dffaf4d0914b714555213d1809f38d4",
       "max_bytes": 5000000,
       "file": "pycdlib-1.14.0-py2.py3-none-any.whl"
+    },
+    "pypdf": {
+      "url": "https://files.pythonhosted.org/packages/1b/4d/c9d2d67f204eff463237a1a8f5e25a6923b7b1043982b91fcaf104c8ef60/pypdf-6.21.2-py3-none-any.whl",
+      "sha256": "1d44d1a3a200f25062adff0085b02040e4646431ac2ccac22e42679e91466084",
+      "max_bytes": 5000000,
+      "file": "pypdf-6.21.2-py3-none-any.whl"
     }
   }
 }

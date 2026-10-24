@@ -60,7 +60,7 @@ def get_json(path,limit=32768):return json.loads(read(path,limit))
 
 def validate_request(obj):
     if not isinstance(obj,dict) or set(obj)!={'version','id','action'}:raise ValueError('invalid_request')
-    if obj['version']!=1 or obj['action'] not in ('new_table','submit_result'):raise ValueError('invalid_request')
+    if obj['version']!=1 or obj['action'] not in ('new_table','new_document','submit_result'):raise ValueError('invalid_request')
     task_id(obj['id']);return obj
 
 
@@ -94,6 +94,15 @@ def guest_rpc(root,request):
             put_json(folder/'columns.json',columns,exclusive=True)
         write(folder/'data.csv',decode_blob(request['data']),exclusive=True)
         put_json(folder/'status.json',{'phase':'ready_for_agent'});return {'ok':True}
+    if action=='deliver_document' and set(request)=={'action','id','data'}:
+        data=decode_blob(request['data'])
+        if len(data)>1024*1024:raise ValueError('too_large')
+        data.decode('utf-8')
+        write(folder/'document.txt',data,exclusive=True)
+        put_json(folder/'status.json',{'phase':'ready_for_agent','kind':'document'})
+        return {'ok':True}
+    if action=='document_result' and set(request)=={'action','id'}:
+        return {'data':base64.b64encode(read(folder/'result.txt',1024*1024)).decode()}
     if action=='result' and set(request)=={'action','id'}:
         return {'data':base64.b64encode(read(folder/'result.csv')).decode()}
     if action=='status' and set(request)=={'action','id','phase'} and request['phase'] in PHASES:
@@ -105,7 +114,10 @@ class Jobs:
     """Host-only state. The guest cannot approve a result or supply local paths."""
     def __init__(self,root):self.root=Path(root);regular(self.root);self.root.mkdir(parents=True,exist_ok=True)
     def path(self,identifier):return self.root/(task_id(identifier)+'.json')
-    def create(self,identifier):put_json(self.path(identifier),{'phase':'waiting_for_file'},exclusive=True)
+    def create(self,identifier,kind='table'):
+        if kind not in ('table','document'):raise ValueError('kind_invalid')
+        put_json(self.path(identifier),{'phase':'waiting_for_file','kind':kind},exclusive=True)
+    def kind(self,identifier):return get_json(self.path(identifier)).get('kind','table')
     def phase(self,identifier):return get_json(self.path(identifier))['phase']
     def advance(self,identifier,event):
         old=self.phase(identifier)
@@ -114,4 +126,4 @@ class Jobs:
         if event in ('cancel','block') and old not in ('completed','cancelled','blocked'):new='cancelled' if event=='cancel' else 'blocked'
         elif (old,event) in transitions:new=transitions[old,event]
         else:raise ValueError('invalid_transition')
-        put_json(self.path(identifier),{'phase':new});return new
+        put_json(self.path(identifier),{'phase':new,'kind':self.kind(identifier)});return new

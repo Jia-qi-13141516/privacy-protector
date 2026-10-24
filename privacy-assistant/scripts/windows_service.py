@@ -35,18 +35,22 @@ def show_progress(base):
     script='& {\n'+source+"\n} -StatusPath '"+path+"'"
     subprocess.Popen(['powershell.exe','-NoProfile','-STA','-EncodedCommand',base64.b64encode(script.encode('utf-16le')).decode()],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,creationflags=0x08000000)
 
-def safe_source(path):
+def safe_source(path,document=False):
     # Accept a local fixed drive only. No mapped network or cloud retrieval here.
-    if path.suffix.lower() not in ('.xlsx','.csv') or str(path).startswith('\\\\'):raise ValueError('local_table_required')
+    if path.suffix.lower() not in (('.txt','.md','.docx','.pdf') if document else ('.xlsx','.csv')) or str(path).startswith('\\\\'):raise ValueError('local_table_required')
     drive=ctypes.windll.kernel32.GetDriveTypeW
     drive.argtypes=[ctypes.c_wchar_p];drive.restype=ctypes.c_uint
     if drive(path.anchor)!=3:raise ValueError('local_table_required')
-    return read(path)
+    return read(path,5*1024*1024 if document else 20*1024*1024)
 
 def handle(base,backend,jobs,request):
     backend.refresh_network()
     if backend.rpc('online',{'action':'health'}).get('status')!='online':raise ValueError('boundary_changed')
     identifier=task_id(request['id']);action=request['action']
+    if action=='new_document' or (action=='submit_result' and jobs.kind(identifier)=='document'):
+        from document_windows import handle as document_handle
+        document_handle(base,backend,jobs,request,dialogue,safe_source)
+        backend.rpc('online',{'action':'ack','id':identifier});return
     if action=='new_table':
         if jobs.path(identifier).exists():
             backend.rpc('online',{'action':'ack','id':identifier});return
@@ -103,6 +107,8 @@ def main():
         preflight(base)
         register_startup(base)
         backend=Backend(base,install_engine(base,callback));backend.provision(callback)
+        from bridge_bundle import update
+        update(backend,ROOT)
         from vm_acceptance import verify
         verify(backend)
         progress(base,'安装完成')
@@ -116,12 +122,13 @@ def main():
                 request=backend.rpc('online',{'action':'poll'})['request']
                 if request:
                     try:handle(base,backend,jobs,request)
-                    except Exception:
+                    except Exception as error:
                         identifier=task_id(request['id'])
                         try:jobs.advance(identifier,'block')
                         except Exception:pass
                         backend.rpc('online',{'action':'status','id':identifier,'phase':'blocked'})
-                        notify('这份表格未能按当前规则处理，数据未返回聊天。请检查身份编号、所选字段，以及结果是否保留原列和原值。')
+                        from document_engine import ERROR_MESSAGES
+                        notify(ERROR_MESSAGES.get(str(error),'这一步未能通过保护检查，未提供新的原始内容。请检查文件格式、脱敏预览和结果代号；不要改用普通聊天上传原件。'))
                     finally:backend.rpc('online',{'action':'ack','id':request['id']})
             except Exception:
                 # Never reconnect a changed boundary by weakening its settings.

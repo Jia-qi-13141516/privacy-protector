@@ -10,11 +10,9 @@ def config(root,role,password,instance_id):
     def add(path,data,permissions='0644'):
         if isinstance(data,str):data=data.encode()
         writes.append({'path':path,'owner':'root:root','permissions':permissions,'encoding':'b64','content':base64.b64encode(data).decode()})
-    for name in ('task_channel.py','guest_client.py','table_wizard.py','network_policy.py'):
-        add('/opt/privacy-bridge/'+name,(root/'scripts'/name).read_bytes())
-    for name in ('guest_rpc.py','guest_health.py','acceptance_guest.py','setup_guest.sh','guest_skill.md'):
-        add('/opt/privacy-bridge/'+name,(root/'backend'/name).read_bytes(),'0755' if name.endswith('.sh') else '0644')
-    add('/opt/skill/scripts/deidentify.py',(root/'skill/scripts/deidentify.py').read_bytes())
+    from bridge_bundle import files
+    for path,data in files(root).items():add(path,data)
+    add('/opt/privacy-bridge/setup_guest.sh',(root/'backend/setup_guest.sh').read_bytes(),'0755')
     add('/etc/privacy-assistant-guest.json',json.dumps({'role':role,'queue':'/home/teacher/PrivacyTasks'}))
     add('/etc/nftables.conf',firewall())
     unit='[Unit]\nDescription=Privacy assistant first-time setup\nAfter=network-online.target\nWants=network-online.target\nStartLimitIntervalSec=0\nConditionPathExists=!/var/lib/privacy-install/ready.json\n[Service]\nType=oneshot\nExecStart=/bin/sh /opt/privacy-bridge/setup_guest.sh '+role+'\nRestart=on-failure\nRestartSec=30\nTimeoutStartSec=0\n[Install]\nWantedBy=multi-user.target\n'
