@@ -20,6 +20,13 @@ class Setup(unittest.TestCase):
         self.home=Path(self.temp.name)/'skills'
     def tearDown(self):self.temp.cleanup()
     def install(self):return setup.run('codex',False,self.base,self.home)
+    def test_default_install_never_opens_teacher_workflow(self):
+        with patch.object(setup,'probe',return_value={'status':'cli_boundary_verified'}),patch.object(setup.assistant,'start') as start:
+            result=setup.run('codex',base=self.base,skill_home=self.home)
+        start.assert_not_called()
+        self.assertFalse((self.base/'Settings/show-window.json').exists())
+        self.assertTrue((self.home/'privacy-assistant/SKILL.md').exists())
+        self.assertEqual(result['status'],'cli_boundary_verified')
     def test_repeat_install_preserves_profile_bytes(self):
         self.base.mkdir();account=self.base/'existing-client-profile';account.write_bytes(b'FAKE_LOCAL_LOGIN_STATE')
         with patch.object(setup,'probe',return_value={'status':'cli_boundary_verified'}):

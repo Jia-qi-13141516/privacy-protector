@@ -6,7 +6,7 @@ import uuid
 import task_channel as ch
 
 
-def run(agent, base):
+def run(agent, base, selected=None):
     import assistant
     import mac_workflow as ui
     assistant.check_package(); agent=ui.pick_agent(agent)
@@ -14,10 +14,11 @@ def run(agent, base):
         str(ui.ROOT/'skill/scripts/agent_boundary.py'),'--vault',str(base/'Vault'),
         '--exchange',str(base/'Exchange'),'--check'],capture_output=True,timeout=30)
     if probe.returncode:raise ValueError('boundary_failed')
-    ui.choose('仅处理获准使用 AI 的普通工作材料。标密材料不能进入此流程；去掉姓名也可能从事件细节识别人。', ['确认材料允许按此方式处理'])
     identifier=uuid.uuid4().hex;task=base/'Vault'/identifier;p=task/'private';p.mkdir(parents=True,mode=0o700)
-    source=Path(ui.dialog('''set picked to choose file with prompt "选择 Word、文本或纯文字 PDF；原文件不进入聊天。"
-return POSIX path of picked'''))
+    if selected is None:
+        selected=ui.dialog('''set picked to choose file with prompt "选择 Word、文本或纯文字 PDF；原文件不进入聊天。"
+return POSIX path of picked''')
+    source=Path(selected)
     ch.regular(source)
     if source.suffix.lower() not in ('.txt','.md','.docx','.pdf'):raise ValueError('document_format')
     # Supplement rules locally. Empty input is valid, but still requires review.

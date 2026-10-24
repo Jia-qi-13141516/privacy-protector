@@ -105,7 +105,7 @@ def export_confirmed(task, destination):
     ch.write(destination, data, exclusive=True)
 
 
-def run_table(agent, base):
+def run_table(agent, base, selected=None):
     import assistant
     assistant.check_package()
     agent = pick_agent(agent)
@@ -120,7 +120,8 @@ def run_table(agent, base):
     task = base / 'Vault' / identifier
     private = task / 'private'
     private.mkdir(parents=True, mode=0o700)
-    selected = dialog('''set picked to choose file with prompt "选择需要脱敏的 XLSX 或 CSV 原表；原表不进入聊天。"
+    if selected is None:
+        selected = dialog('''set picked to choose file with prompt "选择需要脱敏的 XLSX 或 CSV 原表；原表不进入聊天。"
 return POSIX path of picked''')
     source = Path(selected)
     ch.regular(source)
@@ -176,13 +177,20 @@ After saving, tell the user to return to the local Skill window for review.\n'''
 
 
 def run(agent, base, feature=None):
+    selected=None
     if feature is None:
-        selected=choose('选择这次要处理的材料。原文件只在本地窗口选择。',['表格保护：统计、筛选与回填','文档保护：摘要、改写与整理'])
-        feature='table' if selected.startswith('表格') else 'document'
-    if feature=='table':return run_table(agent,base)
+        import assistant
+        assistant.check_package()
+        selected=dialog('''set picked to choose file with prompt "选择要处理的文件；程序自动识别材料类型，原文件不进入聊天。"
+return POSIX path of picked''')
+        suffix=Path(selected).suffix.lower()
+        if suffix in ('.csv','.xlsx'):feature='table'
+        elif suffix in ('.txt','.md','.docx','.pdf'):feature='document'
+        else:raise ValueError('document_format')
+    if feature=='table':return run_table(agent,base,selected=selected)
     if feature=='document':
         from document_mac import run as run_document
-        return run_document(agent,base)
+        return run_document(agent,base,selected=selected)
     raise ValueError('feature_invalid')
 
 

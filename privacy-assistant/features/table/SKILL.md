@@ -5,7 +5,7 @@ description: 隐私保护Skill的独立表格功能。处理XLSX/CSV的数值统
 
 # 表格保护
 
-从包根目录安装并打开隐私保护Skill，在本地选择“表格保护”。只接触安装包，不从聊天读取原表。安装入口与平台条件遵循根目录 SKILL.md。
+从包根目录后台安装隐私保护Skill。仅明确需要旧版本地向导时打开 `--open`；选定文件后自动识别表格功能。只接触安装包，不从聊天读取原表。安装入口与平台条件遵循根目录 SKILL.md。
 
 Mac 独立入口是 `scripts/mac_workflow.py codex table`（或 `claude table`）；Windows 隔离 WorkBuddy 内使用 `guest_client.py new --kind table`。这些入口只能由已经校验安装的包调用。
 

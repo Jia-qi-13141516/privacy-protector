@@ -102,7 +102,8 @@ def main():
     if ctypes.get_last_error()==183:kernel.CloseHandle(mutex);return 0
     try:
         progress(base,'正在检查已有环境')
-        show_progress(base)
+        background='--background' in sys.argv
+        if not background:show_progress(base)
         callback=lambda label,done=0,total=0:progress(base,label,done,total)
         preflight(base)
         register_startup(base)
@@ -128,7 +129,7 @@ def main():
                         except Exception:pass
                         backend.rpc('online',{'action':'status','id':identifier,'phase':'blocked'})
                         from document_engine import ERROR_MESSAGES
-                        notify(ERROR_MESSAGES.get(str(error),'这一步未能通过保护检查，未提供新的原始内容。请检查文件格式、脱敏预览和结果代号；不要改用普通聊天上传原件。'))
+                        progress(base,ERROR_MESSAGES.get(str(error),'保护检查未通过，任务已停止'))
                     finally:backend.rpc('online',{'action':'ack','id':request['id']})
             except Exception:
                 # Never reconnect a changed boundary by weakening its settings.
@@ -148,7 +149,7 @@ def main():
         code=str(error) if str(error) in (*messages,'guest_install_timeout','component_download_failed','engine_install_not_completed') else 'installation_not_completed'
         put_json(base/'Settings/automatic-setup.json',{'status':'blocked','code':code,'current_agent_isolated':False})
         progress(base,'安装未完成')
-        notify(messages.get(code,'安装尚未完成，保护没有启用。再次打开隐私助手会重试，并保留已有环境和登录资料。'))
+        progress(base,messages.get(code,'安装未完成，保护尚未启用'))
         return 2
     finally:
         kernel.ReleaseMutex(mutex);kernel.CloseHandle(mutex)

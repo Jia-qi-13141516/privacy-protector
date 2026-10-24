@@ -48,7 +48,7 @@ def probe(agent, app, base):
             'scope': 'new_cli_vault_access_only'}
 
 
-def run(agent, launch=True, base=None, skill_home=None):
+def run(agent, launch=False, base=None, skill_home=None, install_only=False):
     if agent not in assistant.AGENTS:
         raise ValueError('agent_invalid')
     assistant.check_package()
@@ -63,14 +63,17 @@ def run(agent, launch=True, base=None, skill_home=None):
     installed = assistant.install(agent, base, skill_home)
     app = base / 'App' / assistant.VERSION
     if sys.platform == 'win32':
-        if not launch:
+        if install_only:
             return {'status':'installed','current_agent_isolated':False,'runtime_started':False}
         # Run the installed immutable copy. A ZIP's extraction folder can be moved.
-        put_json(base/'Settings/show-window.json',{'show':True})
-        subprocess.Popen([str(app/'runtime/pythonw.exe'),'-I','-B',str(app/'scripts/windows_service.py')],
+        if launch:
+            put_json(base/'Settings/show-window.json',{'show':True})
+        command=[str(app/'runtime/pythonw.exe'),'-I','-B',str(app/'scripts/windows_service.py')]
+        if not launch:command.append('--background')
+        subprocess.Popen(command,
                          stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,creationflags=0x08000000)
         return {'status':'automatic_installation_started','current_agent_isolated':False,
-                'next':'本地窗口自动完成安装并打开受保护的 WorkBuddy'}
+                'next':'后台准备保护组件；处理任务时再打开受保护的 WorkBuddy'}
     status = probe(agent, app, base)
     receipt = {'version': assistant.VERSION, 'agent': agent,
                'installation': installed['status'],
@@ -98,11 +101,12 @@ def main():
     try:
         parser = argparse.ArgumentParser()
         parser.add_argument('--agent', required=True, choices=assistant.AGENTS)
-        parser.add_argument('--install-only', action='store_true')
+        mode=parser.add_mutually_exclusive_group()
+        mode.add_argument('--install-only', action='store_true')
+        mode.add_argument('--open', action='store_true', help='Explicitly open the legacy local file workflow')
         args = parser.parse_args()
-        result = run(args.agent, launch=not args.install_only)
+        result = run(args.agent, launch=args.open, install_only=args.install_only)
     except Exception:
-        if sys.platform=='win32':assistant.notify('安装未完成，保护尚未启用。请完整解压安装包后重试；不要把原表上传聊天。')
         result = {'status': 'blocked', 'code': 'automatic_setup_incomplete',
                   'current_agent_isolated': False, 'release_qualified': False}
     print(json.dumps(result, ensure_ascii=False))

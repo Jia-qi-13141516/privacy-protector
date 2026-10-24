@@ -2,12 +2,12 @@
 name: privacy-assistant
 description: 安装或启动隐私保护Skill。在 Windows 部署持久 WorkBuddy 环境，在 Mac 打开本地表格或文档向导和受保护 Codex / Claude Code 命令行。原件在本地脱敏、核验与回填，只读取安装包。
 metadata:
-  version: "0.8.0"
+  version: "0.8.1"
 ---
 
 # 隐私保护Skill
 
-用户把安装包交给本地 Agent 并要求安装、启用时，直接执行安装器，不把配置工作交给用户。Windows 用包内 `runtime/python.exe -I -B scripts/auto_setup.py --agent workbuddy`；当前客户端是 Codex 或 Claude Code 时分别换成 `codex` 或 `claude`。工作目录为本包根目录，路径带空格时按调用环境正确引用。不要执行下载来源不明的脚本。
+用户把安装包交给本地 Agent 并要求安装、启用时，直接执行安装器，默认只在后台准备组件，不打开功能选择或启动确认窗口，不把配置工作交给用户。Windows 用包内 `runtime/python.exe -I -B scripts/auto_setup.py --agent workbuddy`；当前客户端是 Codex 或 Claude Code 时分别换成 `codex` 或 `claude`。工作目录为本包根目录，路径带空格时按调用环境正确引用。不要执行下载来源不明的脚本。
 
 macOS 使用 Python 3.9 或更新版本运行 `python3 -B scripts/auto_setup.py --agent codex`；已安装 Claude Code 时改为 `claude`。先检查 Python 与客户端命令可运行，缺失时从其官方渠道安装，系统授权与首次登录交本人完成。WorkBuddy 的 Mac 界面不受隔离，不能作为受保护分析入口。
 
@@ -15,7 +15,7 @@ macOS 使用 Python 3.9 或更新版本运行 `python3 -B scripts/auto_setup.py 
 
 安装器核验本包，安装稳定入口，自动下载并校验官方组件，建立两个持久运行环境，注册当前用户登录后恢复。Windows 三种入口均打开独立环境内的 WorkBuddy；不声称宿主 Codex、Claude 或原 WorkBuddy 窗口已经被隔离。运行库和表格依赖已打包，无需用户配置 Python、JSON 或命令。
 
-`automatic_installation_started` 只表示后台开始。用户在本地进度窗口看到安装结果；程序使用虚构表格自动验收后才显示就绪。需要状态时，只读取安装目录 `Settings/automatic-setup.json` 的固定状态，不读取该目录其他内容、原表、映射或导出成果。失败时由用户再次要求打开助手，复用已有环境继续；不得改走上传原表、临时沙盒或关闭安全设置。
+`automatic_installation_started` 只表示后台开始。安装状态由 Agent 读取固定状态文件反馈；默认不弹进度或许可窗口。程序使用虚构表格自动验收后才显示就绪。需要状态时，只读取安装目录 `Settings/automatic-setup.json` 的固定状态，不读取该目录其他内容、原表、映射或导出成果。失败时由用户再次要求打开助手，复用已有环境继续；不得改走上传原表、临时沙盒或关闭安全设置。
 
 首次系统授权和首次 WorkBuddy 账号登录由本人完成。安装器不提取原客户端凭据。运行磁盘和登录资料长期保留，不因退出而重装；服务商仍可能要求重新认证。
 
@@ -37,3 +37,9 @@ macOS 使用 Python 3.9 或更新版本运行 `python3 -B scripts/auto_setup.py 
 Windows 要求：x64、Windows 10 2004 或更新版本、至少 8 GB 内存、12 GB 可用磁盘、已开启硬件虚拟化及首次联网下载能力。系统策略、BIOS 和账号认证不能由 Skill 越权绕过。纯云端 Agent 没有本机执行能力时不能自动部署到用户电脑，不能让用户上传原表替代。
 
 macOS 先在本地窗口选择原表、唯一编号和允许的字段，离线程序处理后才打开新的 Codex / Claude Code 命令行。Agent 只读取任务目录的 data.csv、columns.json 和 AGENTS.md，保存 result.csv；用户回到本地窗口核验并确认，实名文件保存在受保护目录，并由访达定位。不得在安装器所在的原会话读取原表、review.txt、Vault 或实名导出文件。仅限新启动进程及其子进程的访问隔离，不是整机或虚拟机隔离。技术验证范围见 `验证范围.md`。
+
+## 当前自动化边界
+
+安装默认后台执行。仅用户明确要打开旧版本地向导时使用 `--open`；不要在安装或后台验收时启动向导。旧向导按用户选定的文件自动识别表格或文档，不再让用户选择功能。
+
+0.8.1 尚未达到“说任务即可全自动处理”的验收标准：本机 Codex 真实模型会话在现有隔离下因系统配置同步失败而中止；表格尚需逐列设置，文档规则仍须人工检查漏检。不得把后台安装成功说成后台任务已完成，也不得通过取消脱敏检查或放开原件访问来伪造成功。

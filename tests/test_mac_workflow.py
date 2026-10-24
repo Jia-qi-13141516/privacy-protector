@@ -7,6 +7,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1] / 'privacy-assistant'
 sys.path.insert(0, str(ROOT / 'scripts'))
@@ -34,6 +35,18 @@ class MacWorkflow(unittest.TestCase):
 
     def tearDown(self):
         self.temp.cleanup()
+
+    def test_file_type_dispatch_never_asks_for_feature_choice(self):
+        import assistant
+        import document_mac
+        for filename,kind in [('sample.CSV','table'),('sample.DOCX','document')]:
+            selected=str(self.base/filename)
+            with patch.object(assistant,'check_package'),patch.object(workflow,'dialog',return_value=selected) as pick,patch.object(workflow,'choose',side_effect=AssertionError('unexpected feature selector')),patch.object(workflow,'run_table') as table,patch.object(document_mac,'run') as document:
+                workflow.run('codex',self.base)
+            pick.assert_called_once()
+            active,unused=(table,document) if kind=='table' else (document,table)
+            active.assert_called_once_with('codex',self.base,selected=selected)
+            unused.assert_not_called()
 
     def prepare(self):
         workflow.worker('ingest', self.task)

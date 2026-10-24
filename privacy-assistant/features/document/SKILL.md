@@ -5,7 +5,7 @@ description: 隐私保护Skill的文档功能。本地提取TXT、Markdown、基
 
 # 文档保护
 
-从包根目录安装并打开隐私保护Skill，在本地选择“文档保护”。只接触安装包；不能读取原件、词表、脱敏前的预览或身份映射。安装入口与平台条件遵循根目录 SKILL.md。
+从包根目录后台安装隐私保护Skill。仅明确需要旧版本地向导时打开 `--open`；选定文件后自动识别文档功能。只接触安装包；不能读取原件、词表、脱敏前的预览或身份映射。安装入口与平台条件遵循根目录 SKILL.md。
 
 Mac 独立入口为 `scripts/mac_workflow.py codex document`（或 `claude document`）；Windows 隔离 WorkBuddy 内使用 `guest_client.py new --kind document`。
 
