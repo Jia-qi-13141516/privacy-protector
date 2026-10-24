@@ -1,12 +1,6 @@
 ---
 name: privacy-table
-description: 隐私保护Skill的独立表格功能。处理XLSX/CSV的数值统计、分类汇总、筛选、限定新增列与本地身份回填。
+description: 隐私保护Skill的表格筛选、统计、统一跟进与优先级列，以及本地身份回填。
 ---
 
-# 表格保护
-
-从包根目录后台安装隐私保护Skill。仅明确需要旧版本地向导时打开 `--open`；选定文件后自动识别表格功能。只接触安装包，不从聊天读取原表。安装入口与平台条件遵循根目录 SKILL.md。
-
-Mac 独立入口是 `scripts/mac_workflow.py codex table`（或 `claude table`）；Windows 隔离 WorkBuddy 内使用 `guest_client.py new --kind table`。这些入口只能由已经校验安装的包调用。
-
-保留全部原代号、原列和原值；可筛选记录，新增 follow_up（yes/no）、priority（0—3）。保存 result.csv 后由本地窗口核验、回填、确认导出。任意新列、自由文本和公式不在此功能范围。
+使用包根目录 SKILL.md 中的后台入口，提交自然语言任务即可。程序从本地文件识别类型，不打开旧向导。原件、代号稿和结果正文都留在本地；Agent 只读取任务状态，不直接读取真实文件。不要调用旧版人工确认或在线分析入口。

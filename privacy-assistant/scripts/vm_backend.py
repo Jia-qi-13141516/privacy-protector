@@ -135,7 +135,7 @@ class Backend:
         try:
             remote='/var/lib/privacy-control/'+identifier+'.json'
             self.cli('guestcontrol',self.state['machines'][role]['id'],'copyto',*self.credentials(role),str(local),remote)
-            reply=json.loads(self.guest(role,'/usr/bin/python3',['-I','/opt/privacy-bridge/guest_rpc.py',identifier]))
+            reply=json.loads(self.guest(role,'/usr/bin/python3',['-I','/opt/privacy-bridge/guest_rpc.py',identifier],timeout=3600 if request.get('action')=='background_task' else 120))
         finally:local.unlink(missing_ok=True)
         if not isinstance(reply,dict) or 'error' in reply:raise ValueError(reply.get('error','guest_response_invalid') if isinstance(reply,dict) else 'guest_response_invalid')
         return reply
@@ -181,14 +181,15 @@ class Backend:
             if self.info(role).get('VMState')=='poweroff':return
             time.sleep(2)
         raise ValueError('vm_shutdown_pending')
-    def provision(self,progress=lambda *args:None):
-        if all(self.state['machines'].get(role,{}).get('ready') for role in ('offline','online')):
-            for role in ('offline','online'):
+    def provision(self,progress=lambda *args:None,roles=('offline','online')):
+        if not roles or any(role not in ('offline','online') for role in roles):raise ValueError('invalid_role')
+        if all(self.state['machines'].get(role,{}).get('ready') for role in roles):
+            for role in roles:
                 self.enforce_idle_nat(role);self.boundary(role)
             return self
         lock=get_json(ROOT/'backend/assets.json')['assets']
         disk=fetch(lock['ubuntu_disk'],self.base/'Cache',lambda n,total:progress('正在下载独立运行环境',n,total))
-        for role in ('offline','online'):
+        for role in roles:
             progress('正在准备本地处理环境' if role=='offline' else '正在安装 WorkBuddy',0,0)
             entry=self.state['machines'].get(role)
             if entry and entry.get('ready'):
@@ -209,7 +210,7 @@ class Backend:
                 if not volume.exists():self.cli('clonemedium','disk',str(disk),str(volume),'--format','VDI',timeout=600)
                 self.cli('showmediuminfo','disk',str(volume))
                 self.cli('modifymedium','disk',str(volume),'--resize','30720' if role=='online' else '10240')
-                self.cli('modifyvm',identifier,'--memory','3072' if role=='online' else '1024','--cpus','2','--graphicscontroller','vmsvga','--vram','128','--nic1','nat','--nic2','none','--clipboard-mode','disabled','--draganddrop','disabled','--audio-enabled','off','--usb-ohci','off','--usb-ehci','off','--usb-xhci','off','--vrde','off','--nat-localhostreachable1','off','--boot1','disk','--boot2','none','--boot3','none','--boot4','none')
+                self.cli('modifyvm',identifier,'--memory','3072','--cpus','2','--graphicscontroller','vmsvga','--vram','128','--nic1','nat','--nic2','none','--clipboard-mode','disabled','--draganddrop','disabled','--audio-enabled','off','--usb-ohci','off','--usb-ehci','off','--usb-xhci','off','--vrde','off','--nat-localhostreachable1','off','--boot1','disk','--boot2','none','--boot3','none','--boot4','none')
                 if 'SATA' not in self.info(role).values():self.cli('storagectl',identifier,'--name','SATA','--add','sata','--controller','IntelAhci')
                 self.cli('storageattach',identifier,'--storagectl','SATA','--port','0','--device','0','--type','hdd','--medium',str(volume))
                 self.cli('storageattach',identifier,'--storagectl','SATA','--port','1','--device','0','--type','dvddrive','--medium',str(folder/'seed.iso'))

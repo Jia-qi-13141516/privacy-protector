@@ -1,4 +1,4 @@
-param([string]$InputPath,[string]$OutputPath)
+﻿param([string]$InputPath,[string]$OutputPath)
 $ErrorActionPreference='Stop'
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
@@ -7,11 +7,12 @@ function Save-Reply($value) {
   $json=ConvertTo-Json -InputObject $value -Depth 12 -Compress
   [IO.File]::WriteAllText($OutputPath,$json,(New-Object Text.UTF8Encoding($false)))
 }
-if ($request.mode -eq 'file' -or $request.mode -eq 'document_file') {
+if ($request.mode -in @('file','document_file','any_file')) {
   $d=New-Object Windows.Forms.OpenFileDialog
   $d.Title='选择需要处理的原表 · 文件只在本地读取'
   $d.Filter='表格文件 (*.xlsx;*.csv)|*.xlsx;*.csv'
   if ($request.mode -eq 'document_file') { $d.Title='选择文档 · 原件只在本地读取'; $d.Filter='文档 (*.docx;*.txt;*.md;*.pdf)|*.docx;*.txt;*.md;*.pdf' }
+  if ($request.mode -eq 'any_file') { $d.Title='选择要处理的文件'; $d.Filter='支持的文件 (*.xlsx;*.csv;*.docx;*.txt;*.md;*.pdf)|*.xlsx;*.csv;*.docx;*.txt;*.md;*.pdf' }
   $d.Multiselect=$false
   if ($d.ShowDialog() -eq 'OK') { Save-Reply @{path=$d.FileName} } else { Save-Reply @{cancelled=$true} }
   exit

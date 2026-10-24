@@ -19,3 +19,9 @@ VirtualBox 基础程序、Ubuntu 镜像、Microsoft Visual C++ 运行库和 Work
 WorkBuddy 为第三方产品，使用其账号和服务须遵循对应条款。本项目不隶属于这些组件的提供方。
 
 - pypdf：PDF 正文提取，BSD-3-Clause；固定版本及 SHA-256 见 tools/runtime-lock.json，许可证随 runtime/Lib/site-packages/pypdf-*.dist-info/licenses/LICENSE 分发。
+
+0.9.0 的本地推理组件：
+
+- llama.cpp b11856，MIT，来自 ggml-org 官方构建。三个平台的固定压缩包随安装 ZIP 提供，原许可证位于 runtime/inference-assets/LICENSE-llama.cpp.txt。
+- Qwen2.5-1.5B-Instruct-GGUF（Q4_K_M），Apache 2.0，首次从 ModelScope 的官方 Qwen 仓库下载；不把权重塞入分享包。许可证位于 runtime/inference-assets/LICENSE-Qwen.txt。下载版本、大小和 SHA-256 固定在 privacy-assistant/backend/local-model.json。
+- 模型出处：https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF 。推理程序出处：https://github.com/ggml-org/llama.cpp/releases/tag/b11856 。

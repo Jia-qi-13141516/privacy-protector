@@ -1,4 +1,4 @@
-"""One local front door. Never accepts raw data or a raw path from the Agent."""
+"""Verified installation and compatibility entrypoints; background.py runs current tasks."""
 import argparse
 import hashlib
 import json
@@ -14,7 +14,7 @@ ROOT=Path(__file__).resolve().parents[1]
 CORE=ROOT/'skill'
 sys.path.insert(0,str(CORE/'scripts'))
 sys.path.insert(0,str(ROOT/'runtime/Lib/site-packages'))
-VERSION='0.8.1'
+VERSION='0.9.0'
 AGENTS=('workbuddy','codex','claude')
 
 
@@ -52,7 +52,7 @@ def doctor():
     local=sys.platform in ('darwin','win32')
     report={'version':VERSION,'local_desktop':local,'installed_means_isolated':False,
       'raw_data_access_requested':False,'windows_device_validated':False,
-      'current_agent_isolated':False,'table_wizard_available':local,'document_wizard_available':local,
+      'current_agent_isolated':False,'background_entry_available':local,'document_processing':'local_extractive',
       'configuration_files_required_from_teacher':False}
     if not local:report.update(status='blocked',code='local_desktop_required');return report
     try:check_package()
@@ -62,13 +62,14 @@ def doctor():
     report['table_runtime_ready']=dependencies
     if sys.platform=='win32':
         report['architecture_supported']=platform.machine().lower() in ('amd64','x86_64')
-        report['backend']='persistent_virtual_machines'
+        report['backend']='persistent_offline_virtual_machine'
         report['automatic_component_installation']=True
         ready=dependencies and report['architecture_supported']
     else:
         report['sandbox_installed']=Path('/usr/bin/sandbox-exec').is_file();ready=dependencies and report['sandbox_installed']
-        report['cli_available']={a:shutil.which(a) is not None for a in ('codex','claude')}
-        report['workbuddy_mac_isolation_supported']=False
+        report['backend']='offline_local_worker'
+        report['second_agent_login_required']=False
+        report['host_agent_isolated']=False
     report.update(status='setup_ready' if ready else 'blocked',code='setup_ready' if ready else 'environment_not_ready')
     return report
 
@@ -110,8 +111,9 @@ def install(agent,base=None,skill_home=None):
         content=(ROOT/'skills/start/SKILL.md').read_text(encoding='utf-8')
         if agent=='workbuddy':content=content.replace('name: privacy-assistant\n','name: privacy-assistant-launcher\n',1)
         content+='\n本机入口：`'+str(app/'scripts/auto_setup.py')+'`。此路径仅用于本地启动，不放进分享包。\n'
+        content+='\n本机后台任务入口：`'+str(app/'scripts/background.py')+'`。\n'
         (dest/'SKILL.md').write_text(content,encoding='utf-8');marker.write_text(VERSION)
-    return {'status':'installed','version':VERSION,'agent':agent,'current_agent_isolated':False,'next':'打开隐私助手'}
+    return {'status':'installed','version':VERSION,'agent':agent,'current_agent_isolated':False,'next':'后台准备处理组件'}
 
 
 def choose_agent(current):

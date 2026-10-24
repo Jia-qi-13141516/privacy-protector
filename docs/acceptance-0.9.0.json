@@ -1,0 +1,198 @@
+{
+  "version": "0.9.0",
+  "date": "2026-10-25",
+  "platform": "macOS Apple Silicon",
+  "materials": "synthetic only",
+  "installation": "fresh extraction of final ZIP, default background installation",
+  "zip_sha256": "75e7b28910d2e6f4b939ee99c19b056f9d5d7f33a8dd0236cc527253845ce041",
+  "package_files_verified": 1694,
+  "automated_tests_passed": 127,
+  "independent_forward_cases_passed": 4,
+  "installed_cases": {
+    "table": {
+      "job_id": "35adfe4647e945e0a94d71753a374fb4",
+      "task": "筛选待补材料数不低于3的记录，按待补材料数从大到小排列，新增是否跟进为需跟进、优先级统一为1，并统计记录数。",
+      "source_sha256": "b2eee6e1f95a997c1911e456b4e150b17af77070bc03f89f4693f59f1925211b",
+      "pass": true,
+      "receipt": {
+        "input_sha256": "b2eee6e1f95a997c1911e456b4e150b17af77070bc03f89f4693f59f1925211b",
+        "network": "os_blocked",
+        "cloud_data_sent": false,
+        "model": "Qwen2.5-1.5B-Instruct-Q4_K_M",
+        "human_confirmation": false,
+        "kind": "table",
+        "rows": 5,
+        "input_rows": 8,
+        "zero_match": false,
+        "local_model_calls": 0,
+        "result_name": "result.xlsx"
+      },
+      "actual_rows": [
+        [
+          "工号",
+          "姓名",
+          "待补材料数",
+          "已核对份数",
+          "备注",
+          "是否跟进",
+          "优先级"
+        ],
+        [
+          "F108",
+          "虚构岑岳",
+          "6",
+          "3",
+          "仅供测试辛",
+          "需跟进",
+          1
+        ],
+        [
+          "F104",
+          "虚构许禾",
+          "5",
+          "1",
+          "仅供测试丁",
+          "需跟进",
+          1
+        ],
+        [
+          "F105",
+          "虚构孟乔",
+          "4",
+          "7",
+          "仅供测试戊",
+          "需跟进",
+          1
+        ],
+        [
+          "F102",
+          "虚构程澄",
+          "3",
+          "2",
+          "仅供测试乙",
+          "需跟进",
+          1
+        ],
+        [
+          "F107",
+          "虚构罗棠",
+          "3",
+          "6",
+          "仅供测试庚",
+          "需跟进",
+          1
+        ]
+      ],
+      "summary": [
+        [
+          "项目",
+          "结果"
+        ],
+        [
+          "原始记录数",
+          8
+        ],
+        [
+          "符合条件记录数",
+          5
+        ],
+        [
+          "待补材料数：合计",
+          21
+        ],
+        [
+          "待补材料数：均值",
+          4.2
+        ],
+        [
+          "已核对份数：合计",
+          19
+        ],
+        [
+          "已核对份数：均值",
+          3.8
+        ]
+      ],
+      "values_and_identity_match": true
+    },
+    "document": {
+      "job_id": "977d8d968c6c41c3a195919f68f39547",
+      "task": "把这份工作纪要整理为未完成待办，保留负责人、交给谁、数量和期限，排除已结束事项和纯分工说明。",
+      "source_sha256": "419f23ac7e061f87b6ab06694258ef6e40b59acbaa0c9885c9fac988509a8e4d",
+      "pass": true,
+      "receipt": {
+        "input_sha256": "419f23ac7e061f87b6ab06694258ef6e40b59acbaa0c9885c9fac988509a8e4d",
+        "network": "os_blocked",
+        "cloud_data_sent": false,
+        "model": "Qwen2.5-1.5B-Instruct-Q4_K_M",
+        "human_confirmation": false,
+        "kind": "document",
+        "paragraphs": 3,
+        "entities": 4,
+        "local_model_calls": 2,
+        "result_name": "result.docx"
+      },
+      "selected_ids": [
+        2,
+        3,
+        6
+      ],
+      "exact_original_paragraphs_match": true
+    },
+    "zero_match": {
+      "job_id": "3fed267a293248b8a0fd99753b433451",
+      "task": "筛选待补材料数大于99的记录，新增是否跟进为需跟进、优先级统一为1，并统计记录数。",
+      "source_sha256": "b2eee6e1f95a997c1911e456b4e150b17af77070bc03f89f4693f59f1925211b",
+      "pass": true,
+      "receipt": {
+        "input_sha256": "b2eee6e1f95a997c1911e456b4e150b17af77070bc03f89f4693f59f1925211b",
+        "network": "os_blocked",
+        "cloud_data_sent": false,
+        "model": "Qwen2.5-1.5B-Instruct-Q4_K_M",
+        "human_confirmation": false,
+        "kind": "table",
+        "rows": 0,
+        "input_rows": 8,
+        "zero_match": true,
+        "local_model_calls": 0,
+        "result_name": "result.xlsx"
+      },
+      "actual_rows": [
+        [
+          "工号",
+          "姓名",
+          "待补材料数",
+          "已核对份数",
+          "备注",
+          "是否跟进",
+          "优先级"
+        ]
+      ],
+      "summary": [
+        [
+          "项目",
+          "结果"
+        ],
+        [
+          "原始记录数",
+          8
+        ],
+        [
+          "符合条件记录数",
+          0
+        ]
+      ],
+      "values_and_identity_match": true
+    }
+  },
+  "ui_confirmations": 0,
+  "source_files_unchanged": true,
+  "network_boundary": "OS-denied network, Mach lookup, Apple Events; inherited by inference child",
+  "local_model": "Qwen2.5-1.5B-Instruct-Q4_K_M",
+  "limitations": [
+    "Windows and Intel Mac not tested on actual devices",
+    "Document extraction only, not arbitrary rewriting",
+    "No revocation of host Agent permissions"
+  ],
+  "mac_starter_without_cloud_cli": "passed fixed-argument invocation check"
+}

@@ -3,7 +3,8 @@ import hashlib,json,os,re,tempfile,time,urllib.parse,urllib.request
 from pathlib import Path
 from task_channel import regular
 
-HOSTS={'download.virtualbox.org','cloud-images.ubuntu.com','download.codebuddy.cn','download.visualstudio.microsoft.com'}
+HOSTS={'download.virtualbox.org','cloud-images.ubuntu.com','download.codebuddy.cn','download.visualstudio.microsoft.com',
+       'github.com','release-assets.githubusercontent.com','modelscope.cn','cdn-lfs-cn-1.modelscope.cn'}
 
 def checked_url(url):
     p=urllib.parse.urlsplit(url)

@@ -21,3 +21,5 @@ Machines/
 *.log
 .env
 .env.*
+
+.archive/

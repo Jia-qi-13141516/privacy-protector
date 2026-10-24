@@ -1,0 +1,12 @@
+{
+  "model": {
+    "url": "https://modelscope.cn/models/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/e8b19c78f775ccbcf6df15ceace6bb5276f09765/qwen2.5-1.5b-instruct-q4_k_m.gguf",
+    "sha256": "6a1a2eb6d15622bf3c96857206351ba97e1af16c30d7a74ee38970e434e9407e",
+    "max_bytes": 1117320736
+  },
+  "runtimes": {
+    "darwin-arm64": {"url": "https://github.com/ggml-org/llama.cpp/releases/download/b11856/llama-b11856-bin-macos-arm64.tar.gz", "sha256": "f961fd5a488a22177c4942765b7ba8371f7025b53320656d46c06aed6ca43738", "max_bytes": 16244700},
+    "darwin-x86_64": {"url": "https://github.com/ggml-org/llama.cpp/releases/download/b11856/llama-b11856-bin-macos-x64.tar.gz", "sha256": "a06974186c508a8cb229803b5561fc6f0540702197fdd2dafc243fcee1d44708", "max_bytes": 11983287},
+    "linux-x86_64": {"url": "https://github.com/ggml-org/llama.cpp/releases/download/b11856/llama-b11856-bin-ubuntu-x64.tar.gz", "sha256": "71b660dd4a90c13db899acdef59862226f7ec8d27907b7c107febc99904c00be", "max_bytes": 22439524}
+  }
+}

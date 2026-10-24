@@ -12,6 +12,17 @@ TASKS=Path('/var/lib/privacy-tasks')
 QUEUE=Path('/home/teacher/PrivacyTasks')
 
 def offline(request):
+    if request.get('action')=='background_task':
+        if set(request)!={'action','id','extension','data','instruction'}:raise ValueError('invalid_request')
+        from background_worker import require_offline,execute
+        require_offline()
+        identifier=task_id(request['id']);task=TASKS/identifier
+        if task.exists() or request['extension'] not in ('.xlsx','.csv','.txt','.md','.docx','.pdf'):raise ValueError('invalid_request')
+        task.mkdir(parents=True,mode=0o700)
+        source=task/('input'+request['extension']);write(source,decode_blob(request['data']),True)
+        config=get_json(Path('/opt/privacy-local/config.json'))
+        result=execute(task,source,request['instruction'],config)
+        return {'receipt':result,'data':base64.b64encode(read(task/result['result_name'])).decode()}
     import table_wizard as wizard
     d=wizard.d;d.isolation_check()
     identifier=task_id(request.get('id'));task=TASKS/identifier

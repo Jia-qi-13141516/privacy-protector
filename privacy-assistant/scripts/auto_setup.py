@@ -1,8 +1,6 @@
-"""Automatic local installation. A successful copy is never a security receipt.
+"""Install the verified background worker without UI or a second Agent login.
 
-This entry deliberately refuses the disposable Windows session: that session
-cannot satisfy the persistent-login requirement. Backend readiness is live,
-not inferred from an old state file or from the Agent's statement.
+Explicit legacy --open/--install-only paths remain for compatibility.
 """
 import argparse
 import json
@@ -62,6 +60,17 @@ def run(agent, launch=False, base=None, skill_home=None, install_only=False):
     previous = get_json(state) if state.exists() else {}
     installed = assistant.install(agent, base, skill_home)
     app = base / 'App' / assistant.VERSION
+    if not launch and not install_only:
+        executable=str(app/'runtime/pythonw.exe') if sys.platform=='win32' else sys.executable
+        options={'stdout':subprocess.DEVNULL,'stderr':subprocess.DEVNULL,'stdin':subprocess.DEVNULL,'close_fds':True}
+        if sys.platform=='win32':options['creationflags']=0x08000000
+        else:options['start_new_session']=True
+        subprocess.Popen([executable,'-B',str(app/'scripts/background.py'),'setup','--base',str(base)],**options)
+        receipt={'status':'background_installation_started','version':assistant.VERSION,'agent':agent,
+                 'current_agent_isolated':False,'release_qualified':False,'account_files_modified':False,
+                 'installation_reused':previous.get('version')==assistant.VERSION}
+        put_json(state,receipt)
+        return receipt
     if sys.platform == 'win32':
         if install_only:
             return {'status':'installed','current_agent_isolated':False,'runtime_started':False}

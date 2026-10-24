@@ -8,10 +8,11 @@
 
 ```sh
 python3 tools/prepare_runtime.py
+python3 tools/bundle_local_runtime.py
 python3 tools/build_release.py --archive
 ```
 
-第一个命令根据固定版本和 SHA-256 下载 Python 官方 NuGet 包及三个纯 Python wheel，并保留原许可证。第二个命令生成文件清单和安装 ZIP，输出到 `dist/`。构建缓存与运行环境不纳入 Git。
+第一个命令根据固定版本和 SHA-256 下载 Python 官方 NuGet 包及三个纯 Python wheel，并保留原许可证。第二个命令准备固定推理组件；第三个命令生成文件清单和安装 ZIP，输出到 `dist/`。构建缓存与运行环境不纳入 Git。
 
 ## 回归测试
 
@@ -50,8 +51,10 @@ python3 tools/build_readme_demo.py
 
 ## 功能模块
 
-`privacy-assistant/features/table/` 和 `features/document/` 是同一 Skill 的两个独立功能入口。表格保留 CSV 结果协议；文档仅通过 document.txt/result.txt 交换正文，原件、补充词表和身份映射不进入交换目录。Mac 共用 OS 隔离，Windows 共用持久双环境，升级固定桥接组件时保留客户端磁盘与账号资料。
+`privacy-assistant/features/table/` 和 `features/document/` 共用后台入口，按本地文件后缀自动分流。旧版手动向导和云端交换代码仅保留为兼容实现，不由0.9.0默认入口启动。
 
-文档由本地程序提取、替换和预览，原稿通过本地确认后才发布；只允许恢复已批准文本里出现过的代号。摘要可以省略代号，不能利用猜测代号恢复被删去的人。输出检查不能证明语义正确，必须再由本人核对。
+## 0.9.0 后台入口
 
-文档测试使用虚构材料，覆盖格式拒绝、密级标记、身份替换、发送前确认、部分内容删除、未知代号与篡改拦截、干净正文导出，以及 Mac/Windows 控制流程。GUI/Agent 编排用模拟回调；不得将其称为实机 UI 或云端模型效果验收。
+使用 `scripts/background.py submit --input <虚构文件> --task <任务>` 提交，用 `status --id <编号>` 读取完成状态。公开回复不含原文、脱敏稿或映射。数据处理由 `background_worker.py` 在OS断网环境执行；表格计算在 `background_engine.py`，文档调用固定的本地推理程序。
+
+完整分享包需包含三种平台的推理压缩包及许可证。运行 `python3 tools/bundle_local_runtime.py` 下载、核对并打包这些固定组件，再运行 `python3 tools/build_release.py --archive`。模型权重不进Git或ZIP，由首次安装从固定ModelScope版本下载。运行 `python3 -m unittest discover -s tests -p 'test_*.py' -v`；真实模型验收单独记录，不能用单元测试或模拟输出替代。
