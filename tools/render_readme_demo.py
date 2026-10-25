@@ -62,7 +62,7 @@ def intro(t,R):
  return im
 
 def selfcheck(t,R):
- im,d=base('首次安装后，先用虚构材料检查','下面的执行顺序为流程示意；右侧数字来自本次真实安装自检。',0)
+ im,d=base('首次安装后，先用虚构材料检查','安装后自动检查环境并试跑；右侧为 Mac 样例的实测结果。',0)
  rr(d,(48,275,745,693));pill(d,(72,296),'流程示意',AMBER,AP)
  labels=['检查电脑资源','确认处理进程断网','试跑虚构表格与文档','核验结果后启用']
  for i,label in enumerate(labels):
@@ -72,7 +72,7 @@ def selfcheck(t,R):
   txt(d,(122,y),label,26,INK if done else MUTED)
  rr(d,(72,618,721,674),AP,None,10)
  txt(d,(88,628),'规则示意：可用内存不足时停止，不自动转云端。',21,AMBER)
- rr(d,(768,275,1232,693));pill(d,(792,296),'本次实测',GREEN,GP)
+ rr(d,(768,275,1232,693));pill(d,(792,296),'样例实测',GREEN,GP)
  receipt=R['first_self_check'];num=len(receipt['checks']);secs=receipt['elapsed_seconds']
  txt(d,(800,350),f'{num} / {num}',54,TEAL);txt(d,(802,414),'核验项目通过',24)
  txt(d,(800,470),f'{secs:.2f} 秒',40);txt(d,(802,522),'自检耗时，不含首次下载',21,MUTED)
@@ -125,7 +125,7 @@ def document(t,R):
  return im
 
 def ending(t,R):
- im,d=base('展示的是结果，也说清验证范围','本片按真实回执和输出重绘，播放节奏不代表软件实际处理耗时。',-1)
+ im,d=base('样例结果与设备要求','虚构材料的实测结果；画面为流程示意，播放速度不代表处理耗时。',-1)
  cards=[('9 / 9','首次自检核验通过'),('5 条 · 21 份','表格筛选与合计'),('第 2、3、6 段','未完成待办摘录')]
  for i,(number,label) in enumerate(cards):
   x=48+i*400;rr(d,(x,287,x+384,460));txt(d,(x+25,320),number,36,TEAL);txt(d,(x+25,393),label,23)
