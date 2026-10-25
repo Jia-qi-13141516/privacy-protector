@@ -51,6 +51,13 @@ try:
   except ValueError as e:assert str(e)=='source_busy'
   assert not (j/'original.csv').exists()
  finally:held.Close()
+ # A second hard link would retain another accessible path to the same bytes.
+ linked=base/'linked.csv';alias=base/'alias.csv';linked_job=private/'linked';linked_job.mkdir();protect(linked_job)
+ with impersonate(token):linked.write_bytes(data);os.link(linked,alias)
+ try:
+  store.seal(linked,linked_job,sid,None,100000);raise AssertionError('hard link accepted')
+ except ValueError as e:assert str(e)=='linked_source',e
+ assert not (linked_job/'original.csv').exists() and user_read(linked)==data and user_read(alias)==data
  # Public messages are authenticated using the actual pipe client token.
  def handler(obj,peer):return {'peer_matches':peer==sid,'ready':True}
  threading.Thread(target=rpc.serve,args=(sid,handler),daemon=True).start()
@@ -79,7 +86,7 @@ try:
   try:rpc.server_is_system(bad);raise AssertionError('unsafe instance-creation ACL accepted')
   except ValueError as e:assert str(e)=='protection_unavailable'
  finally:bad.Close()
- report={'os':'Windows','kernel_acl':True,'ordinary_user_read_before_sealing':True,'ordinary_user_denied_after_sealing':True,'permission_changes_denied':True,'snapshot_denied':True,'confirmed_export_exact':True,'existing_export_preserved':True,'explicit_restore_exact':True,'open_handle_refused':True,'pipe_client_identity':True,'sequential_pipe_requests':50,'private_pipe_denied':True,'unsafe_server_instance_acl_rejected':True,'fictional_only':True,'ui_tested':False,'offline_vm_processing_tested':False}
+ report={'os':'Windows','kernel_acl':True,'ordinary_user_read_before_sealing':True,'ordinary_user_denied_after_sealing':True,'permission_changes_denied':True,'snapshot_denied':True,'confirmed_export_exact':True,'existing_export_preserved':True,'explicit_restore_exact':True,'open_handle_refused':True,'hardlink_refused_before_read':True,'pipe_client_identity':True,'sequential_pipe_requests':50,'private_pipe_denied':True,'unsafe_server_instance_acl_rejected':True,'fictional_only':True,'ui_tested':False,'offline_vm_processing_tested':False}
  Path(sys.argv[1]).write_text(json.dumps(report,indent=2))
 finally:
  if token:token.Close()

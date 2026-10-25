@@ -1,5 +1,5 @@
 """Pinned local inference. Downloads finish before any original is opened."""
-import hashlib,json,os,platform,shutil,subprocess,tarfile,tempfile
+import hashlib,json,os,platform,posixpath,shutil,subprocess,tarfile,tempfile
 from pathlib import Path,PurePosixPath
 import task_channel as ch
 import performance
@@ -19,14 +19,16 @@ def archive_files(archive):
         if len(members)>1000 or sum(x.size for x in members)>300*1024*1024:raise ValueError('runtime_archive_invalid')
         for entry in members:
             name=PurePosixPath(entry.name)
-            if name.is_absolute() or '..' in name.parts or '\\' in entry.name:raise ValueError('runtime_archive_invalid')
+            if name.is_absolute() or '..' in name.parts or '\\' in entry.name or ':' in entry.name:raise ValueError('runtime_archive_invalid')
             if entry.isdir():continue
             member=entry
             for _ in range(8):
                 if not member.issym():break
-                resolved=PurePosixPath(os.path.normpath(str(PurePosixPath(member.name).parent/member.linkname)))
+                if '\\' in member.linkname or ':' in member.linkname:raise ValueError('runtime_archive_invalid')
+                resolved=PurePosixPath(posixpath.normpath(str(PurePosixPath(member.name).parent/member.linkname)))
                 if resolved.is_absolute() or '..' in resolved.parts:raise ValueError('runtime_archive_invalid')
-                member=package.getmember(str(resolved))
+                try:member=package.getmember(str(resolved))
+                except KeyError:raise ValueError('runtime_archive_invalid') from None
             if not member.isfile():raise ValueError('runtime_archive_invalid')
             yield str(name),package.extractfile(member).read(),member.mode
 

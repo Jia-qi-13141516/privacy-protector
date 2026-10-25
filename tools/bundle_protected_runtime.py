@@ -1,5 +1,5 @@
 """Prepare portable macOS runtimes and the trusted UI; never register a service."""
-import argparse,hashlib,json,os,shutil,subprocess,sys,tarfile,tempfile
+import argparse,hashlib,json,os,posixpath,shutil,subprocess,sys,tarfile,tempfile
 from pathlib import Path,PurePosixPath
 BASE=Path(__file__).resolve().parents[1];APP=BASE/'privacy-assistant'
 sys.path.insert(0,str(APP/'scripts'))
@@ -16,7 +16,7 @@ def extract(archive,dest):
             item=entry
             for _ in range(8):
                 if not item.issym():break
-                target=PurePosixPath(os.path.normpath(str(PurePosixPath(item.name).parent/item.linkname)))
+                target=PurePosixPath(posixpath.normpath(str(PurePosixPath(item.name).parent/item.linkname)))
                 if target.is_absolute() or '..' in target.parts or target.parts[0]!='python':raise ValueError('archive_link')
                 item=package.getmember(str(target))
             if not item.isfile():raise ValueError('archive_type')
