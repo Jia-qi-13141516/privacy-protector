@@ -59,6 +59,9 @@ class Ready(unittest.TestCase):
     def test_failure_never_copies_exception_material_to_health(self):
         self.prepare.side_effect=RuntimeError('SECRET_STUDENT /private/source.xlsx')
         g=self.gate();g._start();self.assertNotIn('SECRET',json.dumps(g.public()))
+        diagnostic=Files.get_json(g.state.with_name('readiness-error.json'))
+        self.assertNotIn('SECRET',json.dumps(diagnostic));self.assertNotIn('/private/source',json.dumps(diagnostic))
+        self.assertEqual(diagnostic['type'],'RuntimeError')
     def test_broker_never_opens_picker_before_ready(self):
         g=self.gate();ui=Mock();store=self.base/'jobs';b=Broker(store,self.worker,ui,501,20,Files,g)
         with self.assertRaisesRegex(ValueError,'not_ready'):b.public({'action':'submit','task':'统计记录数'},501)

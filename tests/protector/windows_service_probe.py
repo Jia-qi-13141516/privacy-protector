@@ -64,6 +64,8 @@ try:
     print(json.dumps({'readiness_phase':status.get('phase'),'code':status.get('code')}),flush=True);last_phase=status.get('phase')
    if status.get('phase') in ('ready','blocked') or time.monotonic()>=deadline:break
    time.sleep(3)
+  diagnostic=installed/'State/Jobs/readiness-error.json'
+  if diagnostic.exists():report['private_structural_diagnostic']=json.loads(diagnostic.read_text(encoding='utf-8'))
   report['automatic_preparation']={'ready':status.get('ready') is True,'phase':status.get('phase'),'code':status.get('code'),'observation_timed_out':status.get('phase') not in ('ready','blocked'),'self_test_passed':status.get('self_test_passed') is True,'business_material_submitted':False}
   report['service']={'production_installer':True,'bundled_interpreter':True,'system_identity_autostart':True,'ordinary_user_config_denied':True,'executable_write_denied':True,'health_rpc':True,'pre_ready_task_rejected':True,'stop_repeat_install_and_restart':True,'first_phase':status.get('phase'),'restart_phase':again.get('phase'),'first_code':status.get('code'),'restart_code':again.get('code'),'vm_processing_tested':False,'interactive_ui_tested':False}
  finally:

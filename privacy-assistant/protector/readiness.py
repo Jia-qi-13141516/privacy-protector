@@ -1,5 +1,5 @@
 """Service-owned readiness. No business file is accepted before real self-test success."""
-import hashlib,json,threading,time,uuid
+import hashlib,json,threading,time,traceback,uuid
 from pathlib import Path
 import protocol
 
@@ -51,8 +51,15 @@ class Readiness:
                 receipt.update(phase='ready',fingerprint=key)
                 if not self_check.cache_valid(receipt,key):raise ValueError('self_test_failed')
                 self.permissions.atomic_json(self.state,receipt)
+            self.state.with_name('readiness-error.json').unlink(missing_ok=True)
             with self.lock:self.record={'ready':True,'phase':'ready','self_test_passed':True,'self_test_reused':reused,'boundary':'separate_os_identity','material_api':False}
         except Exception as error:
+            # Private structural diagnostics only: no exception text, source
+            # lines, local variables, request data or absolute paths.
+            try:
+                frames=[{'module':Path(f.filename).name,'function':f.name,'line':f.lineno} for f in traceback.extract_tb(error.__traceback__)[-8:]]
+                self.permissions.atomic_json(self.state.with_name('readiness-error.json'),{'code':protocol.failure(error)['error'],'type':type(error).__name__,'frames':frames})
+            except Exception:pass
             with self.lock:self.record={'ready':False,'phase':'blocked','self_test_passed':False,'code':protocol.failure(error)['error']}
     def require(self):
         if not self.public().get('ready'):raise ValueError('not_ready')
