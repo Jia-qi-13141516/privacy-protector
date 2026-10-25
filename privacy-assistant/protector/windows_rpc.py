@@ -32,7 +32,8 @@ def io_operation(handle,operation,timeout=10000):
     try:
         pending=operation(ov)
         if win32event.WaitForSingleObject(ov.hEvent,timeout)!=win32event.WAIT_OBJECT_0:
-            win32file.CancelIoEx(handle,ov)
+            # Every operation on this handle is issued by this thread.
+            win32file.CancelIo(handle)
             try:win32file.GetOverlappedResult(handle,ov,True)
             except pywintypes.error:pass
             raise ValueError('ipc_timeout')

@@ -62,6 +62,9 @@ try:
    if _==29:raise
    time.sleep(.1)
  assert reply=={'peer_matches':True,'ready':True},reply
+ for _ in range(50):
+  with impersonate(token):reply=rpc.request(rpc.endpoint(sid),{'action':'health'})
+  assert reply=={'peer_matches':True,'ready':True},reply
  threading.Thread(target=rpc.serve,args=(sid,lambda obj,peer:{'private':True},True),daemon=True).start();time.sleep(.2)
  with impersonate(token):
   try:rpc.request(rpc.endpoint(sid,True),{'action':'review','id':'a'*32},private=True);raise AssertionError('private pipe accepted')
@@ -76,7 +79,7 @@ try:
   try:rpc.server_is_system(bad);raise AssertionError('unsafe instance-creation ACL accepted')
   except ValueError as e:assert str(e)=='protection_unavailable'
  finally:bad.Close()
- report={'os':'Windows','kernel_acl':True,'ordinary_user_read_before_sealing':True,'ordinary_user_denied_after_sealing':True,'permission_changes_denied':True,'snapshot_denied':True,'confirmed_export_exact':True,'existing_export_preserved':True,'explicit_restore_exact':True,'open_handle_refused':True,'pipe_client_identity':True,'private_pipe_denied':True,'unsafe_server_instance_acl_rejected':True,'fictional_only':True,'ui_tested':False,'offline_vm_processing_tested':False}
+ report={'os':'Windows','kernel_acl':True,'ordinary_user_read_before_sealing':True,'ordinary_user_denied_after_sealing':True,'permission_changes_denied':True,'snapshot_denied':True,'confirmed_export_exact':True,'existing_export_preserved':True,'explicit_restore_exact':True,'open_handle_refused':True,'pipe_client_identity':True,'sequential_pipe_requests':50,'private_pipe_denied':True,'unsafe_server_instance_acl_rejected':True,'fictional_only':True,'ui_tested':False,'offline_vm_processing_tested':False}
  Path(sys.argv[1]).write_text(json.dumps(report,indent=2))
 finally:
  if token:token.Close()
