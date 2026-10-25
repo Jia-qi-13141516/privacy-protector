@@ -1,5 +1,5 @@
 {
-  "date": "2026-10-25",
+  "date": "2026-10-26",
   "development_version": "0.11.0-dev",
   "release_qualified": false,
   "branch": "codex/platform-installation",
@@ -23,8 +23,6 @@
   },
   "windows": {
     "os": "Windows Server 2025 x64 GitHub hosted runner",
-    "tested_commit": "25ed7f27bd43899db28ac925904eece85bbb7e1f",
-    "run_url": "https://github.com/Jiaqi-Guo-0114/privacy-protector/actions/runs/40207602235",
     "component_tests": {
       "run": 30,
       "skipped": 2,
@@ -53,11 +51,42 @@
     "service": {
       "scope": "Windows SCM lifecycle only; no VM processing or interactive desktop acceptance",
       "fictional_only": true,
+      "private_structural_diagnostic": {
+        "code": "ui_unavailable",
+        "type": "ValueError",
+        "frames": [
+          {
+            "module": "readiness.py",
+            "function": "_start",
+            "line": 45
+          },
+          {
+            "module": "windows_daemon.py",
+            "function": "probe",
+            "line": 49
+          },
+          {
+            "module": "windows_store.py",
+            "function": "denied_as_user",
+            "line": 43
+          },
+          {
+            "module": "windows_store.py",
+            "function": "user_token",
+            "line": 8
+          },
+          {
+            "module": "windows_native.py",
+            "function": "active_token",
+            "line": 32
+          }
+        ]
+      },
       "automatic_preparation": {
         "ready": false,
-        "phase": "preparing",
-        "code": null,
-        "observation_timed_out": true,
+        "phase": "blocked",
+        "code": "ui_unavailable",
+        "observation_timed_out": false,
         "self_test_passed": false,
         "business_material_submitted": false
       },
@@ -70,14 +99,30 @@
         "health_rpc": true,
         "pre_ready_task_rejected": true,
         "stop_repeat_install_and_restart": true,
-        "first_phase": "preparing",
+        "first_phase": "blocked",
         "restart_phase": "preparing",
-        "first_code": null,
+        "first_code": "ui_unavailable",
         "restart_code": null,
         "vm_processing_tested": false,
         "interactive_ui_tested": false
       }
-    }
+    },
+    "service_tested_commit": "a7e2b069b16ebbf2d67299a7d5258a09b047b9d6",
+    "service_run_url": "https://github.com/Jiaqi-Guo-0114/privacy-protector/actions/runs/40208707026",
+    "full_flow_attempt": {
+      "tested_commit": "02626b4ea18546b61459530ae3ac6150273a5e1d",
+      "run_url": "https://github.com/Jiaqi-Guo-0114/privacy-protector/actions/runs/40209830605",
+      "outcome": "blocked_at_ci_desktop_identity_precondition",
+      "observed_active_token_elevated": true,
+      "ordinary_linked_token_api": "GetTokenInformation(TokenLinkedToken)",
+      "windows_error_code": 1312,
+      "installer_executed_in_this_attempt": false,
+      "synthetic_roundtrip_executed": false,
+      "protection_bypassed": false,
+      "business_data_used": false
+    },
+    "native_tested_commit": "02626b4ea18546b61459530ae3ac6150273a5e1d",
+    "native_run_url": "https://github.com/Jiaqi-Guo-0114/privacy-protector/actions/runs/40209830605"
   },
   "not_verified": [
     "Windows full offline VM preparation and actual document/table processing",
@@ -89,5 +134,6 @@
     "Physical 8GB devices",
     "OS reboot, interrupted installation, cross-version upgrade and uninstall",
     "Independent security review"
-  ]
+  ],
+  "timezone": "Asia/Shanghai"
 }

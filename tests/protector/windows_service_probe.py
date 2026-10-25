@@ -1,11 +1,11 @@
 """Production Windows SCM lifecycle, disposable GitHub-hosted machines only."""
-import hashlib,json,os,re,sys,time,uuid
+import hashlib,json,os,re,sys,time
 from pathlib import Path
 REPO_ROOT=Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(REPO_ROOT/'privacy-assistant/protector'))
 if os.environ.get('GITHUB_ACTIONS')!='true' or os.environ.get('RUNNER_ENVIRONMENT')!='github-hosted':raise SystemExit('disposable CI only')
 from windows_native import *
-import windows_rpc as rpc,win32net
+import windows_rpc as rpc
 root_only();privilege(win32security.SE_RESTORE_NAME)
 # Reuse only this disposable runner's active desktop identity. A random user
 # created without a desktop session cannot pass production desktop binding.

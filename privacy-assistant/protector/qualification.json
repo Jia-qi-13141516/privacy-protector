@@ -13,5 +13,6 @@
   "physical_8gb_device": "not_tested",
   "protected_installer_and_first_run_selftest": "macos_arm64_ci_passed_windows_pending",
   "public_release_updated": false,
-  "windows_automatic_preparation": "not_ready_after_600_second_ci_observation_no_business_material_accepted"
+  "windows_automatic_preparation": "reached_desktop_identity_probe_in_ci_but_enrolled_test_user_had_no_matching_desktop",
+  "windows_full_flow": "blocked_ci_active_desktop_is_elevated_and_has_no_linked_ordinary_token"
 }

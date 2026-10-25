@@ -22,6 +22,6 @@ python3 -B -m unittest discover -s tests/protector -p 'test_*.py'
 
 `windows_native_probe.py` 与 `run_windows_probe.ps1` 只允许在一次性 GitHub 托管 Windows 测试机中运行，验证真实 ACL、文件句柄和命名管道身份；不模拟其成功，也不代表 VirtualBox、桌面窗口或 WorkBuddy 已验收。`.github/workflows/platform-validation.yml` 提供调度配置，必须以实际运行结果为准。
 
-`windows_service_probe.py` 配合 `run_windows_probe.ps1 -Service`，在另一进程中验证实际安装器、包内 Python、SYSTEM 服务、自启动配置、配置文件拒绝读取、程序拒绝修改、就绪前任务拒绝、停止与重复安装后启动。它不等待离线虚拟机处理，因此不能作为 Windows 完整任务验收。
+`windows_service_probe.py` 配合 `run_windows_probe.ps1 -Service`，在另一进程中验证实际安装器、包内 Python、SYSTEM 服务、自启动配置、配置文件拒绝读取、程序拒绝修改、就绪前任务拒绝、停止与重复安装后启动。它记录自动准备状态，并仅在真实自检通过后调用 `windows_roundtrip.py` 处理虚构材料。当前托管机的普通权限桌面身份检查未通过，完整任务测试没有执行；不能把服务生命周期通过当作完整流程通过。
 
 `macos_service_probe.py` 只允许在一次性 GitHub 托管 Mac 上以 root 运行，测试真实安装、下载、自检与虚构文件流程。文件选择和导出确认由测试程序通过私有接口模拟，不代表真实桌面窗口或 WorkBuddy 操作已通过。

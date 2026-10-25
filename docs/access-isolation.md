@@ -50,7 +50,9 @@ GitHub 托管的 Windows Server 2025 测试机已验证：普通账号在封存�
 
 实际安装器使用包内 Python 注册 SYSTEM 服务，配置自动启动；普通账号无法读取私有配置或修改服务程序。就绪前的任务被拒绝，停止后重复安装可重新启动服务。这些结果不代表离线虚拟机任务、Windows 10/11 桌面、系统授权窗口或 WorkBuddy 已验收。[平台核验记录](verification/platform-ci.json)。
 
-Windows 自动准备在 10 分钟观察期内未完成自检，保持不接收业务文件。GitHub 托管机器[不保证嵌套虚拟化的稳定性或兼容性](https://docs.github.com/en/actions/concepts/runners/github-hosted-runners)，这次观察仍不能确定全部阻滞原因；Windows 离线环境需要在合适的可交互设备上继续验收。
+Windows 完整流程仍未通过：一次 10 分钟观察未完成自检；后续尝试已到达桌面身份检查，但临时测试账号与当前桌面不匹配。改用真实桌面身份后，该测试机仅提供提升权限的令牌，读取关联的普通权限令牌失败（系统错误 1312）。测试在此停止，没有跳过身份检查、注入自检成功结果或提交业务材料。完整流程需要满足普通权限桌面条件的测试环境。
+
+GitHub 托管机器[不保证嵌套虚拟化的稳定性或兼容性](https://docs.github.com/en/actions/concepts/runners/github-hosted-runners)。这一平台限制与上述实际身份检查结果分别记录，不能据此推断所有 Windows 设备均可用或均不可用。
 
 ## 发布前仍需完成
 
