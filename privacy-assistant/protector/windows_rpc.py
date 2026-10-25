@@ -13,7 +13,7 @@ def server_is_system(handle,private=False):
     # owner AND the complete DACL instead: no other identity may create server
     # instances or change ownership/ACLs, so owner checks cannot be spoofed by
     # adding a second instance under a genuine SYSTEM-owned pipe name.
-    sd=win32security.GetSecurityInfo(handle,win32security.SE_FILE_OBJECT,win32security.OWNER_SECURITY_INFORMATION|win32security.DACL_SECURITY_INFORMATION)
+    sd=win32security.GetSecurityInfo(handle,win32security.SE_KERNEL_OBJECT,win32security.OWNER_SECURITY_INFORMATION|win32security.DACL_SECURITY_INFORMATION)
     acl=sd.GetSecurityDescriptorDacl()
     if owner(sd)!=SYSTEM or acl is None or acl.GetAceCount()!=(1 if private else 2):raise ValueError('protection_unavailable')
     system_entries=0
