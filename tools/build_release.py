@@ -6,7 +6,7 @@ base=Path(__file__).resolve().parents[1]
 (base/'dist').mkdir(exist_ok=True)
 archive=base/'dist/privacy-assistant-0.11.0-dev.zip'
 qualification=base/'privacy-assistant/protector/qualification.json'
-if args.archive and qualification.exists() and not json.loads(qualification.read_text()).get('release_qualified',False):
+if args.archive and qualification.exists() and not json.loads(qualification.read_text(encoding='utf-8')).get('release_qualified',False):
  parser.error('访问隔离组件尚未通过目标平台的完整验收，不能生成对外安装包；可先进行源码和独立虚拟机测试。')
 r=base/'privacy-assistant'
 for name in ('LICENSE','LICENSE-CC-BY-4.0','NOTICE','LICENSING.md','THIRD_PARTY_NOTICES.md'):
@@ -16,7 +16,7 @@ shutil.copytree(base/'local-table-privacy',r/'skill',ignore=shutil.ignore_patter
 assert (r/'runtime').is_dir(), 'Bundled runtime must be present'
 (r/'skill/SKILL.md').write_text("---\nname: local-table-privacy\ndescription: 隐私保护 Skill 内置的本地表格引擎。通过包根目录安装器调用，不单独启动旧版沙盒。\n---\n\n本目录保存脱敏、校验、回填和测试代码。安装与使用统一遵循包根目录 SKILL.md；Windows 持久环境由 scripts/auto_setup.py 部署。这里保留的底层兼容入口不属于教师操作流程，不要求用户手工配置策略或部署组件。\n",encoding='utf-8')
 # Reuse pure Python libs on macOS as well as the Windows portable runtime.
-p=r/'skill/scripts/deidentify.py';s=p.read_text().replace('import sys\n','import sys\nsys.path.insert(0,str(Path(__file__).resolve().parents[2]/"runtime/Lib/site-packages"))\n',1);p.write_text(s)
+p=r/'skill/scripts/deidentify.py';s=p.read_text(encoding='utf-8').replace('import sys\n','import sys\nsys.path.insert(0,str(Path(__file__).resolve().parents[2]/"runtime/Lib/site-packages"))\n',1);p.write_text(s,encoding='utf-8')
 # Python 3.9 ships on some Macs; correlation() arrived in Python 3.10.
 compat = """
 def _pearson_compat(x, y):
@@ -27,12 +27,12 @@ def _pearson_compat(x, y):
     return max(-1.0,min(1.0,numerator/denominator))
 
 """
-s=p.read_text().replace('def stats(rows, cols):',compat+'def stats(rows, cols):').replace('corr=statistics.correlation(x,y)','corr=(statistics.correlation(x,y) if hasattr(statistics,"correlation") else _pearson_compat(x,y))')
-p.write_text(s)
+s=p.read_text(encoding='utf-8').replace('def stats(rows, cols):',compat+'def stats(rows, cols):').replace('corr=statistics.correlation(x,y)','corr=(statistics.correlation(x,y) if hasattr(statistics,"correlation") else _pearson_compat(x,y))')
+p.write_text(s,encoding='utf-8')
 core_files={p.relative_to(r/'skill').as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted((r/'skill').rglob('*')) if p.is_file() and p.name!='package_manifest.json'}
 (r/'skill/package_manifest.json').write_text(json.dumps(core_files,indent=2))
 for p in r.rglob('__pycache__'):shutil.rmtree(p)
-for p in (r/'scripts').glob('*.py'):ast.parse(p.read_text())
+for p in (r/'scripts').glob('*.py'):ast.parse(p.read_text(encoding='utf-8'))
 files={p.relative_to(r).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(r.rglob('*')) if p.is_file() and p.name!='release.json' and '__pycache__' not in p.parts}
 (r/'release.json').write_text(json.dumps({'version':'0.11.0-dev','files':files},indent=2))
 if args.archive:
