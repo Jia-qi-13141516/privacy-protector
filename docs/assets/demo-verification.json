@@ -1,68 +1,226 @@
 {
-  "input_records": 60,
-  "selected_records": 21,
-  "raw_score_sum": 1644,
-  "deidentified_score_sum": 1644,
-  "identity_and_result_match": true,
-  "original_unchanged": true,
-  "model_called": false,
-  "method": "macOS offline worker; deterministic rule simulates Agent output",
-  "rule": "score >= 30; follow_up = yes; priority = 2",
-  "raw_sample": [
-    [
-      "000010",
-      "虚构学生10",
-      30,
-      "虚构备注（不提供）"
-    ],
-    [
-      "000011",
-      "虚构学生11",
-      31,
-      "虚构备注（不提供）"
-    ],
-    [
-      "000012",
-      "虚构学生12",
-      32,
-      "虚构备注（不提供）"
-    ]
-  ],
-  "safe_sample": [
-    {
-      "person": "p_04e70681189276d493b0bbc3f613b5fa",
-      "measure_3": "30"
+  "version": "0.10.0",
+  "date": "2026-10-25",
+  "presentation": "redrawn_animation_not_screen_recording",
+  "input_source": "fixed_fictional_literals_in_this_script",
+  "real_private_data_read": false,
+  "hardware": {
+    "chip": "Apple M5",
+    "ram_gib": 24.0,
+    "platform": "macOS"
+  },
+  "first_self_check": {
+    "checks": {
+      "table_values": true,
+      "table_sort": true,
+      "table_new_columns": true,
+      "zero_match": true,
+      "document_selection": true,
+      "document_exact_text": true,
+      "originals_unchanged": true,
+      "os_isolation": true,
+      "real_inference": true
     },
-    {
-      "person": "p_7dadad6d40cabd5fc5c939ab13bd6475",
-      "measure_3": "31"
-    },
-    {
-      "person": "p_b081b9943f8006a5c6025935f01f89bf",
-      "measure_3": "32"
-    }
+    "elapsed_seconds": 5.463,
+    "peak_rss_bytes": 1537064960,
+    "local_model_calls": 2,
+    "profile": "compact"
+  },
+  "installation": {
+    "fresh_installation": true,
+    "self_test_reused": false,
+    "download_time_included": false,
+    "existing_verified_model_cache_used": true
+  },
+  "table": {
+    "input_rows": [
+      [
+        "编号",
+        "姓名",
+        "待补材料数",
+        "已核对份数"
+      ],
+      [
+        "T001",
+        "虚构甲",
+        2,
+        4
+      ],
+      [
+        "T002",
+        "虚构乙",
+        3,
+        2
+      ],
+      [
+        "T003",
+        "虚构丙",
+        0,
+        1
+      ],
+      [
+        "T004",
+        "虚构丁",
+        5,
+        1
+      ],
+      [
+        "T005",
+        "虚构戊",
+        4,
+        7
+      ],
+      [
+        "T006",
+        "虚构己",
+        1,
+        0
+      ],
+      [
+        "T007",
+        "虚构庚",
+        3,
+        6
+      ],
+      [
+        "T008",
+        "虚构辛",
+        6,
+        3
+      ]
+    ],
+    "output_rows": [
+      [
+        "编号",
+        "姓名",
+        "待补材料数",
+        "已核对份数",
+        "是否跟进",
+        "优先级"
+      ],
+      [
+        "T008",
+        "虚构辛",
+        6,
+        3,
+        "需跟进",
+        1
+      ],
+      [
+        "T004",
+        "虚构丁",
+        5,
+        1,
+        "需跟进",
+        1
+      ],
+      [
+        "T005",
+        "虚构戊",
+        4,
+        7,
+        "需跟进",
+        1
+      ],
+      [
+        "T002",
+        "虚构乙",
+        3,
+        2,
+        "需跟进",
+        1
+      ],
+      [
+        "T007",
+        "虚构庚",
+        3,
+        6,
+        "需跟进",
+        1
+      ]
+    ],
+    "selected_count": 5,
+    "selected_sum": 21,
+    "sorted_values": [
+      6,
+      5,
+      4,
+      3,
+      3
+    ],
+    "original_values_and_identities_match": true,
+    "model_calls": 0
+  },
+  "document": {
+    "input_paragraphs": [
+      "顾衡是宋岚的项目联络人，宋岚负责社区读书活动的物料。",
+      "顾衡尚未将报名核对表交给宋岚，需要在下周一之前完成交接。",
+      "陶芷负责场地安排，仍需确认周三下午的教室，再把结果告知顾衡。",
+      "宋岚已经核对完本周物料数量并把清单发给陶芷，该事项已结束，无需再次跟进。",
+      "韩舟负责海报，海报已发布并归档，本周不再安排相关工作。",
+      "顾衡收到陶芷的场地结果后，还需要通知宋岚准备物料。"
+    ],
+    "selected_ids": [
+      2,
+      3,
+      6
+    ],
+    "output_paragraphs": [
+      "顾衡尚未将报名核对表交给宋岚，需要在下周一之前完成交接。",
+      "陶芷负责场地安排，仍需确认周三下午的教室，再把结果告知顾衡。",
+      "顾衡收到陶芷的场地结果后，还需要通知宋岚准备物料。"
+    ],
+    "exact_original_text": true,
+    "local_model_calls": 2
+  },
+  "originals_unchanged": true,
+  "offline_worker_verified": true,
+  "simulation": {
+    "low_available_memory_guard": "available_memory_low",
+    "simulated_total_ram_gib": 8,
+    "simulated_available_ram_gib": 1,
+    "physical_hardware_test": false
+  },
+  "not_hardware_validated": [
+    "8GB computer",
+    "Windows / WorkBuddy",
+    "Intel Mac"
   ],
-  "result_sample": [
-    [
-      "000010",
-      "虚构学生10",
-      "30",
-      "需跟进",
-      2
+  "animation": {
+    "format": "GIF",
+    "width": 1280,
+    "height": 800,
+    "duration_seconds": 45,
+    "frame_rate": 6,
+    "chapters": [
+      {
+        "chapter": "开场",
+        "start_seconds": 0,
+        "duration_seconds": 4
+      },
+      {
+        "chapter": "自动自检",
+        "start_seconds": 4,
+        "duration_seconds": 8
+      },
+      {
+        "chapter": "表格处理",
+        "start_seconds": 12,
+        "duration_seconds": 12
+      },
+      {
+        "chapter": "文档摘录",
+        "start_seconds": 24,
+        "duration_seconds": 13
+      },
+      {
+        "chapter": "验证边界",
+        "start_seconds": 37,
+        "duration_seconds": 8
+      }
     ],
-    [
-      "000011",
-      "虚构学生11",
-      "31",
-      "需跟进",
-      2
-    ],
-    [
-      "000012",
-      "虚构学生12",
-      "32",
-      "需跟进",
-      2
-    ]
-  ]
+    "all_frames_are_redrawn": true,
+    "progress_and_low_memory_branch": "illustrative_not_a_hardware_run",
+    "sha256": "1032c0e5ff5c83a8bb4be2d5af3d83b6de481a9b1bc7e5285b16ae88c8b52738"
+  }
 }

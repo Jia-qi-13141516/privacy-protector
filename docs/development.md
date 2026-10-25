@@ -41,13 +41,24 @@ python3 -m unittest discover -s tests -p 'test_persistent_backend.py' -v
 
 ## 重现首页演示
 
-在 macOS 上准备包内表格依赖及 Pillow，运行：
+这段45秒动画是流程重绘，不是软件界面录屏。画面中的数字、原文摘录与自检结果来自0.10.0真实后台流程；动画顺序、亮灯和低内存分支为示意。公开核验记录在 `docs/assets/demo-verification.json`。
+
+在 Apple Silicon Mac 上准备完整0.10.0包及 `openpyxl`、Pillow。以下命令使用一个尚不存在的新临时目录，不改动日常安装；首次需要下载固定本地模型：
 
 ```sh
-python3 tools/build_readme_demo.py
+python3 tools/build_readme_demo.py verify \
+  --package-dir privacy-assistant \
+  --workdir /tmp/privacy-demo-fresh
+python3 tools/render_readme_demo.py \
+  --report /tmp/privacy-demo-fresh/demo-verification.json \
+  --output /tmp/privacy-demo-rendered
 ```
 
-脚本现场生成 60 条虚构记录，调用本地离线处理程序，按固定规则模拟 Agent 结果，核对筛选、身份回填和原表完整性，再生成首页 GIF、静态结果图与核验记录。它不调用云端模型，也不读取业务资料。图中文字使用系统字体 Hiragino Sans GB。
+已有模型缓存时，可在第一个命令添加 `--model-cache /path/to/model.gguf`，脚本先核对固定SHA-256，再复制到临时安装；此时自检耗时不包含下载。图中文字使用macOS的 Hiragino Sans GB 系统字体。
+
+脚本从固定虚构内容生成8条表格记录和6段纪要，完成真实首次安装自检、表格筛选及身份回填、两次本地模型调用与原文摘录比对。原件散列必须保持不变。低内存分支另用模拟资源数值验证，不能替代8GB实机验收。只将经过核对的虚构内容和限定设备指标写入公开记录，不发布运行配置、任务编号或日志。
+
+生成目录中的 `privacy-workflow.gif`、`demo-summary.png` 和 `demo-verification.json` 用于首页；`qa-*` 仅供本地检查。仓库附带的公开结果来自Apple M5 / 24GiB，不能代替其他设备的运行结果。
 
 ## 功能模块
 
