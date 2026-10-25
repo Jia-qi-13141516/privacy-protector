@@ -65,6 +65,8 @@ def install_engine(base,progress):
     script=r'''param([string]$Request)
 $ErrorActionPreference='Stop'
 $r=Get-Content -LiteralPath $Request -Raw -Encoding UTF8 | ConvertFrom-Json
+$elevate=@{}
+if ([System.Security.Principal.WindowsIdentity]::GetCurrent().User.Value -ne 'S-1-5-18') { $elevate.Verb='RunAs' }
 if ((Get-FileHash -LiteralPath $r.runtime -Algorithm SHA256).Hash.ToLower() -ne $r.runtime_sha256) { exit 2 }
 $s=Get-AuthenticodeSignature -LiteralPath $r.runtime
 if ($s.Status -ne 'Valid' -or $s.SignerCertificate.Subject -notmatch 'Microsoft Corporation') { exit 3 }
@@ -73,11 +75,11 @@ $s=Get-AuthenticodeSignature -LiteralPath $r.installer
 if ($s.Status -ne 'Valid' -or $s.SignerCertificate.Subject -notmatch 'Oracle') { exit 3 }
 $v=Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64' -ErrorAction SilentlyContinue
 if (-not $v -or $v.Installed -ne 1 -or [version]$v.Version.TrimStart('v') -lt [version]'14.44.0.0') {
-  $p=Start-Process -FilePath $r.runtime -ArgumentList '/install','/quiet','/norestart' -Verb RunAs -PassThru -Wait
+  $p=Start-Process -FilePath $r.runtime -ArgumentList '/install','/quiet','/norestart' @elevate -PassThru -Wait
   if ($p.ExitCode -eq 3010) { exit 10 }
   if ($p.ExitCode -ne 0) { exit 4 }
 }
-$p=Start-Process -FilePath $r.installer -ArgumentList '--silent','-msiparams','ADDLOCAL=VBoxApplication','REBOOT=ReallySuppress','VBOX_START=0','VBOX_INSTALLDESKTOPSHORTCUT=0','VBOX_REGISTERFILEEXTENSIONS=0' -Verb RunAs -PassThru -Wait
+$p=Start-Process -FilePath $r.installer -ArgumentList '--silent','-msiparams','ADDLOCAL=VBoxApplication','REBOOT=ReallySuppress','VBOX_START=0','VBOX_INSTALLDESKTOPSHORTCUT=0','VBOX_REGISTERFILEEXTENSIONS=0' @elevate -PassThru -Wait
 if ($p.ExitCode -eq 3010) { exit 10 }
 if ($p.ExitCode -ne 0) { exit 4 }
 '''

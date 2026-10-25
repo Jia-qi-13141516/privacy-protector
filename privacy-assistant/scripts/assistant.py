@@ -14,7 +14,7 @@ ROOT=Path(__file__).resolve().parents[1]
 CORE=ROOT/'skill'
 sys.path.insert(0,str(CORE/'scripts'))
 sys.path.insert(0,str(ROOT/'runtime/Lib/site-packages'))
-VERSION='0.10.0'
+VERSION='0.11.0-dev'
 AGENTS=('workbuddy','codex','claude')
 
 
@@ -149,7 +149,7 @@ def notify(message):
 def start(agent=None,show_ui=True,base=None):
     if sys.platform=='win32':
         import auto_setup
-        return auto_setup.run(agent or 'workbuddy',True,base)
+        return auto_setup.run(agent or 'workbuddy')
     info=doctor()
     if info['status']!='setup_ready':
         if show_ui:notify('本机暂不能建立所需隔离。Mac 需要本地命令行 Agent。请先用虚构材料，不能直接交给模型读取真实原表。')
@@ -184,12 +184,14 @@ def main():
     try:
         p=argparse.ArgumentParser();p.add_argument('action',choices=['doctor','install','start','setup','demo'],nargs='?',default='setup');p.add_argument('--agent',choices=AGENTS);p.add_argument('--no-ui',action='store_true');a=p.parse_args()
         if a.action=='doctor':result=doctor()
-        elif a.action=='install':result=install(a.agent or ('workbuddy' if sys.platform=='win32' else 'codex'))
+        elif a.action=='install':
+            from auto_setup import run
+            result=run(a.agent or ('workbuddy' if sys.platform=='win32' else 'codex'))
         elif a.action=='demo':result=start('demo',False)
         else:
             from auto_setup import run
             result=run(a.agent or ('workbuddy' if sys.platform=='win32' else 'codex'))
-        print(json.dumps(result,ensure_ascii=False));return 2 if result['status']=='blocked' else 0
+        print(json.dumps(result,ensure_ascii=False));return 2 if result.get('phase',result.get('status'))=='blocked' else 0
     except Exception:
         print(json.dumps({'status':'blocked','code':'assistant_not_ready','current_agent_isolated':False}));return 2
 

@@ -23,8 +23,10 @@ def require_offline():
 
 def install_execution_guard(binary):
     def audit(event,args):
-        if event.startswith('socket.') or event in ('os.system','os.exec','os.posix_spawn'):raise ValueError('isolation_failed')
-        if event=='subprocess.Popen' and str(args[0])!=binary:raise ValueError('isolation_failed')
+        if event.startswith('socket.') or event in ('os.system','os.exec'):raise ValueError('isolation_failed')
+        # Python 3.14 may implement Popen with posix_spawn even when close_fds
+        # is enabled. Both events must allow only the same pinned executable.
+        if event in ('subprocess.Popen','os.posix_spawn') and os.fsdecode(args[0])!=binary:raise ValueError('isolation_failed')
     sys.addaudithook(audit)
 
 

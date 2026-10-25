@@ -1,0 +1,12 @@
+{
+  "darwin-arm64": {
+    "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20261021/cpython-3.12.15%2B20261021-aarch64-apple-darwin-install_only_stripped.tar.gz",
+    "sha256": "7b8d00b751db21cea87dc551a8f8165147c5fbc5251d5537d7e5497dde00a219",
+    "max_bytes": 25017408
+  },
+  "darwin-x86_64": {
+    "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20261021/cpython-3.12.15%2B20261021-x86_64-apple-darwin-install_only_stripped.tar.gz",
+    "sha256": "f12e0504397683d6be0745ffd4c39ef45a455cec169adf35c628840d06133773",
+    "max_bytes": 24740782
+  }
+}

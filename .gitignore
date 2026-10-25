@@ -23,3 +23,5 @@ Machines/
 .env.*
 
 .archive/
+privacy-assistant/runtime-macos-*/
+privacy-assistant/protector/PrivacyProtectorUI

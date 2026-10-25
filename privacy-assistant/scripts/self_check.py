@@ -28,9 +28,9 @@ def cache_valid(receipt, key):
             and receipt.get('checks') == dict.fromkeys(CHECKS, True))
 
 
-def run_offline(task, config):
+def run_offline(task, config, verify_boundary=None):
     from background_worker import require_offline, install_execution_guard
-    require_offline()  # Also applies to the virtual-machine endpoint.
+    (verify_boundary or require_offline)()  # Boundary is enforced before fixture creation.
     import document_engine as doc
     import table_wizard  # Load the bundled pure-Python spreadsheet dependency path.
     import openpyxl

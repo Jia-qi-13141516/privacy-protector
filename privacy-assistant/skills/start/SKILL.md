@@ -1,18 +1,22 @@
 ---
-name: privacy-assistant
-description: 后台安装并运行隐私保护Skill。让用户说任务、选文件，自动完成本地表格处理或文档摘录，不把原件传给云端模型。
+name: privacy-protector
+description: 通过本地保护组件处理敏感表格和文档。只提交任务和读取状态，由独立权限窗口选文件、核对结果并在确认后导出。
 metadata:
-  version: "0.10.0"
+  version: "0.11.0-dev"
 ---
 
-# 隐私保护Skill
+# Privacy Protector
 
-安装时运行包内 `scripts/auto_setup.py --agent codex|claude|workbuddy`。Mac 使用 Python 3.9+；Windows 使用包内 `runtime/python.exe -I -B`。默认后台安装，不追加 `--open`，不打开旧向导或让用户选择技术选项。
+用户只需说任务、选文件、确认结果。保留当前 Agent 的登录状态，不创建第二个在线聊天环境。
 
-安装后轮询 `Settings/background-setup.json`；只有 `ready` 且 `self_test_passed: true` 才算通过。程序会自动用虚构表格/文档试跑、测量资源并启用省内存模式。`self_testing` 时继续等待；`blocked` 时说明 `message`，不让用户选技术参数、不转云端或放宽隔离。后续同版本复用合格检查，每个任务仍重新检查当前可用内存与断网保护。
+首次使用运行安装包的 `scripts/auto_setup.py --agent codex|claude|workbuddy`。安装器自动选择平台和组件；Windows 使用包内 `runtime/python.exe -I -B`，Mac 使用包内对应架构的 `runtime-macos-arm64/bin/python3` 或 `runtime-macos-x86_64/bin/python3`。操作系统首次授权必须由本人完成，不索取密码或绕过系统策略。安装器返回启动状态不等于自检通过。
 
-使用安装目录的 `scripts/background.py submit --task "用户任务"`。只在用户未提供路径时出现一次本地文件选择；已给路径就传 `--input`，不要读取其内容。根据返回 id 用 `background.py status --id` 查看进度。只读状态，给用户本地结果链接，不读取真实输出、映射、日志或脱敏稿。
+随后用本机受保护入口执行 `health`。仅 `ready: true` 且 `self_test_passed: true` 才提交业务任务；准备和下载期间自动等待，约每10秒查询一次。`blocked` 时说明固定错误，不退回旧入口，不上传文件，不要求老师手工配置。`self_test_reused` 只能表述为复用已合格检查。
 
-表格支持明确数值筛选、数值排序、统计和统一跟进/优先级列；文档支持提取式摘要、待办摘录。分析在本地断网环境进行，代号稿也不交给云端模型。原 Agent 无需重新登录。首次模型下载约 1.1 GB。系统管理员授权不能由 Skill 绕过。
+提交：`client.py submit --task "具体任务"`。不接受 `--input`，不打开真实原件或把它当聊天附件。选文件与确认导出由本地受保护窗口完成。用 `client.py status --id 任务编号` 查询；需要重开结果窗口时用 `client.py review --id 任务编号`。不要读取保护区、映射或结果正文替用户核对。
 
-详细能力与限制见安装包根目录 SKILL.md。保护只覆盖此流程，不会撤销其他工具已获准的文件访问。不得把失败任务改成上传原件，也不得声称 Windows 已通过实机验收。
+任务只包含工作要求，避免在聊天中粘贴学生姓名、账号或原文。表格支持明确数值筛选、排序、统计和已有跟进列功能；文档为本地模型选段与原文摘录。不承诺任意分析或改写，不把生成文件说成已经导入业务系统。
+
+确认导出的普通文件可能被其他软件读取；原件继续受保护。主动取回原件会恢复其普通访问。这不能撤销保护前已复制、读取或上传的数据，也不防范管理员提权或屏幕读取。
+
+开发源码尚未通过完整平台验收时，安装器必须停止。不得把源码、组件测试或临时测试机结果说成老师电脑已通过验收。

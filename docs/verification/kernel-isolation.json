@@ -1,0 +1,102 @@
+{
+  "scope": "disposable Linux VM, actual kernel identities; not Windows or macOS deployment acceptance",
+  "fictional_only": true,
+  "same_processing_engines": true,
+  "real_local_model_used": true,
+  "flow": [
+    {
+      "outcome": {
+        "matched_rows": 3,
+        "quantity_sum": 14,
+        "new_columns": [
+          "是否跟进",
+          "优先级"
+        ]
+      },
+      "worker_uid": 2002,
+      "model_calls": 0,
+      "model_metrics": [],
+      "kind": "table",
+      "original_read_denied": true,
+      "permission_change_denied": true,
+      "private_rpc_denied": true,
+      "public_path_and_export_rejected": true,
+      "original_unchanged": true,
+      "result_exact": true,
+      "confirmed_export_exact": true
+    },
+    {
+      "outcome": {
+        "paragraph_ids": [
+          2,
+          3,
+          6
+        ],
+        "exact_original_excerpt": true
+      },
+      "worker_uid": 2002,
+      "model_calls": 2,
+      "model_metrics": [
+        {
+          "elapsed_seconds": 3.663,
+          "peak_rss_bytes": 1469677568
+        },
+        {
+          "elapsed_seconds": 5.118,
+          "peak_rss_bytes": 1454587904
+        }
+      ],
+      "kind": "document",
+      "original_read_denied": true,
+      "permission_change_denied": true,
+      "private_rpc_denied": true,
+      "public_path_and_export_rejected": true,
+      "original_unchanged": true,
+      "result_exact": true,
+      "confirmed_export_exact": true
+    }
+  ],
+  "protected_source_reused": true,
+  "renamed_source_snapshot_recovered_exactly": true,
+  "symlink_rejected": true,
+  "hardlink_rejected": true,
+  "fifo_rejected": true,
+  "other_identity_denied": true,
+  "existing_export_not_overwritten": true,
+  "open_descriptor_detected_before_plaintext_read": true,
+  "no_automatic_unseal": true,
+  "explicit_private_recovery": true,
+  "verified_at": "2026-10-25T09:54:46.617372+00:00",
+  "environment": {
+    "system": "Ubuntu 26.04 ARM64 disposable VM",
+    "kernel": "7.0.0-28-generic",
+    "guest_memory_gib": 4,
+    "guest_cpus": 3,
+    "host_directories_mounted": false
+  },
+  "unit_and_regression": {
+    "passed": 88,
+    "background": 23,
+    "documents": 33,
+    "performance": 24,
+    "protector": 8
+  },
+  "macos_ui": "compiled_not_executed_as_root",
+  "windows_native_boundary": "not_implemented",
+  "physical_8gb_test": false,
+  "host_deployment": false,
+  "release_published": false,
+  "implementation_sha256": {
+    "privacy-assistant/protector/service.py": "65f6a04ece5f133758b1600067600ee3baac826a783e486c729e7ec00a4325f8",
+    "privacy-assistant/protector/unix_rpc.py": "b11862b84bf29ac8e0a4318ce2b07e8c265dd3ee4508e24bbec892e8c2961bf4",
+    "privacy-assistant/protector/protocol.py": "3cd855dfb821eb2635a51dfe7c498e72f52068b2ca4fd7d60da1a83705ad335b",
+    "privacy-assistant/protector/client.py": "d11a722d7b1bd1a9731cf39940099299c3aa90c28abb20ef1e30ae0353aa1408",
+    "privacy-assistant/protector/linux_enter.py": "25b0bb0ceca38f34a6cf733ca58b5ff891d03b4279b38e2c19ad2b5d68299ad1",
+    "privacy-assistant/protector/posix_store.py": "b59ac220bd091d51e30b08ca723dfde3e8854b55ec46265ba8e15c68e5862401",
+    "privacy-assistant/protector/worker_runner.py": "883c0e7caaf9e1222138e95756c2b97b8bc1ff99e177739dd099115ef12c0d60",
+    "privacy-assistant/protector/broker.py": "1c6e72645bcedd1a05159bb01a2b378e17204c3ce5ddf2609e653f098ba55364",
+    "privacy-assistant/protector/macos_ui.swift": "7e4e1fcdd5e77383e5524bfa4bbd3bfac78f7ef895f027696c89096d3e63c9f7",
+    "privacy-assistant/scripts/background_worker.py": "2b6cb9b6bdf3092426984c3ddc01aaf596f073cf1f797e4ff36b220819d1ddbd",
+    "privacy-assistant/backend/local-model.json": "3df615274d4203de7338dfc4e6422d6a4eeae22639020ed829463be59bd2ea2c"
+  }
+}

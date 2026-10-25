@@ -1,0 +1,16 @@
+{
+  "release_qualified": false,
+  "default_installation_changed": true,
+  "development_version": "0.11.0-dev",
+  "linux_disposable_vm_kernel_and_processing": "passed",
+  "protected_readiness_and_service_restart_linux": "passed",
+  "macos_arm64_portable_python": "executed_in_temporary_build_tree",
+  "macos_ui": "universal_binary_compiled_only",
+  "macos_privileged_service_end_to_end": "not_tested",
+  "windows_native_access_boundary": "implemented_not_executed_on_windows",
+  "windows_service_installation": "implemented_not_executed_on_windows",
+  "workbuddy_end_to_end": "not_tested",
+  "physical_8gb_device": "not_tested",
+  "protected_installer_and_first_run_selftest": "integrated_platform_acceptance_pending",
+  "public_release_updated": false
+}

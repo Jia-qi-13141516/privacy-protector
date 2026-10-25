@@ -15,60 +15,36 @@ import task_channel as ch
 
 class Setup(unittest.TestCase):
     def setUp(self):
-        self.temp=tempfile.TemporaryDirectory()
-        self.base=Path(self.temp.name)/'app'
-        self.home=Path(self.temp.name)/'skills'
+        self.temp=tempfile.TemporaryDirectory();self.base=Path(self.temp.name).resolve();self.app=self.base/'app'
+        (self.app/'skills/start').mkdir(parents=True);(self.app/'skills/start/SKILL.md').write_text('synthetic skill')
     def tearDown(self):self.temp.cleanup()
-    def install(self):return setup.run('codex',False,self.base,self.home,install_only=True)
-    def test_default_install_never_opens_teacher_workflow(self):
-        with patch.object(setup.subprocess,'Popen') as process,patch.object(setup.assistant,'start') as start:
-            result=setup.run('codex',base=self.base,skill_home=self.home)
-        start.assert_not_called()
-        self.assertFalse((self.base/'Settings/show-window.json').exists())
-        self.assertTrue((self.home/'privacy-assistant/SKILL.md').exists())
-        self.assertEqual(result['status'],'background_installation_started')
-        self.assertIn('background.py',process.call_args.args[0][2])
-        self.assertIn('setup',process.call_args.args[0])
-    def test_repeat_install_preserves_profile_bytes(self):
-        self.base.mkdir();account=self.base/'existing-client-profile';account.write_bytes(b'FAKE_LOCAL_LOGIN_STATE')
-        with patch.object(setup,'probe',return_value={'status':'cli_boundary_verified'}):
-            first=self.install();second=self.install()
-        self.assertFalse(first['installation_reused']);self.assertTrue(second['installation_reused'])
-        self.assertEqual(account.read_bytes(),b'FAKE_LOCAL_LOGIN_STATE')
-        self.assertNotIn('FAKE_LOCAL_LOGIN_STATE',(self.base/'Settings/automatic-setup.json').read_text())
-        self.assertFalse(second['release_qualified'])
-    def test_previous_receipt_never_skips_live_probe(self):
-        self.base.mkdir();(self.base/'Settings').mkdir()
-        ch.put_json(self.base/'Settings/automatic-setup.json',{'version':'0.7.0','agent':'codex','status':'ready','release_qualified':True})
-        with patch.object(setup,'probe',return_value={'status':'blocked','code':'isolation_probe_failed'}) as probe,patch.object(setup.assistant,'start') as launch:
-            result=setup.run('codex',True,self.base,self.home)
-        probe.assert_called_once();launch.assert_not_called()
-        self.assertFalse(result['release_qualified']);self.assertEqual(result['status'],'blocked')
-    def test_blocked_backend_never_starts_legacy_fallback(self):
-        with patch.object(setup,'probe',return_value={'status':'blocked','code':'persistent_windows_backend_pending'}),patch.object(setup.assistant,'start') as launch:
-            result=setup.run('workbuddy',True,self.base,self.home)
-        launch.assert_not_called();self.assertEqual(result['code'],'persistent_windows_backend_pending')
-    def test_windows_cannot_claim_persistence(self):
-        with patch.object(setup.sys,'platform','win32'):
-            result=setup.probe('workbuddy',ROOT,self.base)
-        self.assertEqual(result['status'],'requires_runtime_bootstrap');self.assertFalse(result['persistent_session_verified'])
-    def test_gui_not_replaced_by_cli(self):
-        self.assertEqual(setup.probe('workbuddy',ROOT,self.base)['code'],'workbuddy_gui_backend_pending')
-    def test_launch_failure_not_relabelled_success(self):
-        with patch.object(setup,'probe',return_value={'status':'cli_boundary_verified'}),patch.object(setup.assistant,'start',return_value={'status':'blocked','code':'launch_failed'}):
-            self.assertEqual(setup.run('codex',True,self.base,self.home)['status'],'blocked')
-    def test_linked_journal_rejected_before_install(self):
-        self.base.mkdir();(self.base/'Settings').mkdir();other=self.base/'other';other.write_text('{}')
-        (self.base/'Settings/automatic-setup.json').symlink_to(other)
-        with self.assertRaises(ValueError):self.install()
-        self.assertEqual(other.read_text(),'{}');self.assertFalse((self.base/'App').exists())
-    def test_real_mac_cli_canary(self):
-        if sys.platform!='darwin':self.skipTest('macOS required')
-        if setup.assistant.shutil.which('codex') is None:self.skipTest('local Codex CLI required for live probe')
-        result=self.install()
-        self.assertEqual(result['status'],'cli_boundary_verified')
-        self.assertFalse(result['persistent_session_verified'])
-        self.assertFalse(result['current_agent_isolated'])
+    def test_plan_never_installs_or_contacts_service(self):
+        b=setup.bootstrap
+        with patch.object(b,'identity',return_value=501),patch.object(b.sys,'platform','darwin'),patch.object(b.platform,'machine',return_value='arm64'),patch.object(b.subprocess,'run') as process,patch.object(b.client,'request') as rpc:
+            result=b.run('codex',True)
+        self.assertFalse(result['installed']);process.assert_not_called();rpc.assert_not_called()
+    def test_unqualified_build_stops_before_system_authorization(self):
+        b=setup.bootstrap
+        with patch.object(b,'identity',return_value=501),patch.object(b.sys,'platform','darwin'),patch.object(b.platform,'machine',return_value='arm64'),patch.object(b.subprocess,'run') as process,patch.object(b.client,'request') as rpc:
+            with self.assertRaisesRegex(ValueError,'platform_validation_pending'):b.run('codex')
+        process.assert_not_called();rpc.assert_not_called()
+    def test_existing_service_reuses_login_and_never_reinstalls(self):
+        b=setup.bootstrap;login=self.base/'fake-login';login.write_bytes(b'FICTIONAL_LOGIN')
+        with patch.object(b,'identity',return_value=501),patch.object(b.sys,'platform','darwin'),patch.object(b.platform,'machine',return_value='arm64'),patch.object(b,'qualification'),patch.object(b,'verify_tree'),patch.object(b.client,'request',return_value={'ready':False,'phase':'self_testing'}),patch.object(b.subprocess,'run') as process,patch.object(b,'install_launcher'):
+            result=b.run('codex')
+        process.assert_not_called();self.assertTrue(result['installation_reused']);self.assertFalse(result['ready']);self.assertFalse(result['account_files_modified']);self.assertEqual(login.read_bytes(),b'FICTIONAL_LOGIN')
+    def test_custom_skill_never_overwritten(self):
+        b=setup.bootstrap;dest=self.base/'.agents/skills/privacy-protector';dest.mkdir(parents=True);(dest/'SKILL.md').write_text('teacher-owned')
+        with patch.object(b.Path,'home',return_value=self.base):
+            with self.assertRaisesRegex(ValueError,'existing_skill_preserved'):b.install_launcher('codex',self.app)
+        self.assertEqual((dest/'SKILL.md').read_text(),'teacher-owned')
+    def test_managed_skill_repeat_install_is_idempotent(self):
+        b=setup.bootstrap
+        with patch.object(b.Path,'home',return_value=self.base):
+            b.install_launcher('workbuddy',self.app);first=(self.base/'.codebuddy/skills/privacy-protector/SKILL.md').read_bytes();b.install_launcher('workbuddy',self.app)
+        self.assertEqual((self.base/'.codebuddy/skills/privacy-protector/SKILL.md').read_bytes(),first)
+    def test_unknown_agent_does_not_install(self):
+        with self.assertRaisesRegex(ValueError,'agent_invalid'):setup.run('unsupported')
 
 
 class Channel(unittest.TestCase):

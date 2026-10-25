@@ -1,6 +1,6 @@
 # 源码与构建
 
-日常安装使用 Release 中的完整 ZIP。GitHub 的 Source code ZIP 不含 Windows 运行环境；仓库入口 Skill 可根据 `release-lock.json` 获取完整安装包。
+本分支包含尚未通过目标平台完整验收的访问隔离开发代码。默认安装入口和对外打包均关闭发布资格；不要把历史 Release 当作已具备同等保护的替代品。开发测试只用虚构材料和一次性环境，不给开发者日常电脑部署。
 
 ## 构建安装包
 
@@ -9,10 +9,11 @@
 ```sh
 python3 tools/prepare_runtime.py
 python3 tools/bundle_local_runtime.py
-python3 tools/build_release.py --archive
+python3 tools/bundle_protected_runtime.py
+python3 tools/build_release.py
 ```
 
-第一个命令根据固定版本和 SHA-256 下载 Python 官方 NuGet 包及三个纯 Python wheel，并保留原许可证。第二个命令准备固定推理组件；第三个命令生成文件清单和安装 ZIP，输出到 `dist/`。构建缓存与运行环境不纳入 Git。
+依次准备固定 Windows 运行库、推理组件、Mac 双架构便携 Python 与本地窗口，最后生成完整性清单。Mac 窗口构建需要 macOS 和 Swift 编译器。下载均使用固定 SHA-256 并保留许可，构建缓存不纳入 Git。此过程只在构建目录写文件，不注册服务。`--archive` 会在发布资格未满足时拒绝生成对外 ZIP。
 
 ## 回归测试
 
@@ -71,3 +72,7 @@ python3 tools/render_readme_demo.py \
 完整分享包需包含三种平台的推理压缩包及许可证。运行 `python3 tools/bundle_local_runtime.py` 下载、核对并打包这些固定组件，再运行 `python3 tools/build_release.py --archive`。模型权重不进Git或ZIP，由首次安装从固定ModelScope版本下载。运行 `python3 -m unittest discover -s tests -p 'test_*.py' -v`；真实模型验收单独记录，不能用单元测试或模拟输出替代。
 
 首次验收由 `self_check.py` 在实际断网环境调用表格/文档引擎与本地模型。`performance.py` 自动检查可用内存并监测推理进程；运行资源超限、超时、输出不一致或隔离失败都不能写入ready。版本和运行参数变更使旧检查失效。硬件边界测试中的8GB信息是模拟输入，必须与真实模型试跑、8GB实机验收区分。
+
+## 访问隔离组件
+
+独立权限组件位于 `privacy-assistant/protector/`，验证范围见 [实现与验收](access-isolation.md)，复现说明见 [隔离测试](../tests/protector/README.md)。它已接入默认安装入口，首次自检与访问权限检查通过前不接受文件；在 `qualification.json` 的发布条件全部满足前，构建器拒绝生成对外安装包。源码测试、临时虚拟机试跑和正式部署是不同状态。

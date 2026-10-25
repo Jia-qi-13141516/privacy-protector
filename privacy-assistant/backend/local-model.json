@@ -5,8 +5,25 @@
     "max_bytes": 1117320736
   },
   "runtimes": {
-    "darwin-arm64": {"url": "https://github.com/ggml-org/llama.cpp/releases/download/b11856/llama-b11856-bin-macos-arm64.tar.gz", "sha256": "f961fd5a488a22177c4942765b7ba8371f7025b53320656d46c06aed6ca43738", "max_bytes": 16244700},
-    "darwin-x86_64": {"url": "https://github.com/ggml-org/llama.cpp/releases/download/b11856/llama-b11856-bin-macos-x64.tar.gz", "sha256": "a06974186c508a8cb229803b5561fc6f0540702197fdd2dafc243fcee1d44708", "max_bytes": 11983287},
-    "linux-x86_64": {"url": "https://github.com/ggml-org/llama.cpp/releases/download/b11856/llama-b11856-bin-ubuntu-x64.tar.gz", "sha256": "71b660dd4a90c13db899acdef59862226f7ec8d27907b7c107febc99904c00be", "max_bytes": 22439524}
+    "darwin-arm64": {
+      "url": "https://github.com/ggml-org/llama.cpp/releases/download/b11856/llama-b11856-bin-macos-arm64.tar.gz",
+      "sha256": "f961fd5a488a22177c4942765b7ba8371f7025b53320656d46c06aed6ca43738",
+      "max_bytes": 16244700
+    },
+    "darwin-x86_64": {
+      "url": "https://github.com/ggml-org/llama.cpp/releases/download/b11856/llama-b11856-bin-macos-x64.tar.gz",
+      "sha256": "a06974186c508a8cb229803b5561fc6f0540702197fdd2dafc243fcee1d44708",
+      "max_bytes": 11983287
+    },
+    "linux-x86_64": {
+      "url": "https://github.com/ggml-org/llama.cpp/releases/download/b11856/llama-b11856-bin-ubuntu-x64.tar.gz",
+      "sha256": "71b660dd4a90c13db899acdef59862226f7ec8d27907b7c107febc99904c00be",
+      "max_bytes": 22439524
+    },
+    "linux-aarch64": {
+      "url": "https://github.com/ggml-org/llama.cpp/releases/download/b11856/llama-b11856-bin-ubuntu-arm64.tar.gz",
+      "sha256": "540871d9a0aac2b9b92ff42dd6f14449e418a7638302e7c11ccaa9f8b9dc6c98",
+      "max_bytes": 18142807
+    }
   }
 }

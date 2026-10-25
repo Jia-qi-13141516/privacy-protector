@@ -30,6 +30,12 @@
       "sha256": "1d44d1a3a200f25062adff0085b02040e4646431ac2ccac22e42679e91466084",
       "max_bytes": 5000000,
       "file": "pypdf-6.21.2-py3-none-any.whl"
+    },
+    "pywin32": {
+      "file": "pywin32-311-cp312-cp312-win_amd64.whl",
+      "url": "https://files.pythonhosted.org/packages/d1/a8/a0e8d07d4d051ec7502cd58b291ec98dcc0c3fff027caad0470b72cfcc2f/pywin32-311-cp312-cp312-win_amd64.whl",
+      "sha256": "b8c095edad5c211ff31c05223658e71bf7116daa0ecf3ad85f3201ea3190d067",
+      "max_bytes": 9495040
     }
   }
 }

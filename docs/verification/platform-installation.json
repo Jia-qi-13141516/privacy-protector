@@ -1,0 +1,171 @@
+{
+  "date": "2026-10-25",
+  "development_version": "0.11.0-dev",
+  "release_qualified": false,
+  "host_deployment_performed": false,
+  "public_release_updated": false,
+  "component_checks": {
+    "protector": 27,
+    "existing_regressions": 148,
+    "distinct_total": 175,
+    "all_passed": true,
+    "includes_mock_control_flow": true,
+    "windows_native_execution": false
+  },
+  "mac_build_checks": {
+    "arm64_portable_python": "3.12.15 executed in temporary build tree",
+    "intel_portable_python": "downloaded and hash-verified, not executed",
+    "ui_architectures_compiled": [
+      "x86_64",
+      "arm64"
+    ],
+    "privileged_installation_or_ui_run": false
+  },
+  "package_copy_check": {
+    "file_count": 5640,
+    "all_hashes_matched": true,
+    "idempotent_copy": true,
+    "service_registration_performed": false,
+    "temporary_copy_removed": true,
+    "mac_executable_zip_permissions_roundtrip": true
+  },
+  "linux_disposable_vm": {
+    "os": "Ubuntu 26.04 ARM64",
+    "memory_gib": 4,
+    "cpus": 3,
+    "host_directory_mounts": false,
+    "kernel_and_tasks": {
+      "scope": "disposable Linux VM, actual kernel identities; not Windows or macOS deployment acceptance",
+      "readiness": {
+        "ready": true,
+        "phase": "ready",
+        "self_test_passed": true,
+        "self_test_reused": false,
+        "boundary": "separate_os_identity",
+        "material_api": false
+      },
+      "fictional_only": true,
+      "same_processing_engines": true,
+      "real_local_model_used": true,
+      "flow": [
+        {
+          "outcome": {
+            "matched_rows": 3,
+            "quantity_sum": 14,
+            "new_columns": [
+              "是否跟进",
+              "优先级"
+            ]
+          },
+          "worker_uid": 2002,
+          "model_calls": 0,
+          "model_metrics": [],
+          "kind": "table",
+          "original_read_denied": true,
+          "permission_change_denied": true,
+          "private_rpc_denied": true,
+          "public_path_and_export_rejected": true,
+          "original_unchanged": true,
+          "result_exact": true,
+          "confirmed_export_exact": true
+        },
+        {
+          "outcome": {
+            "paragraph_ids": [
+              2,
+              3,
+              6
+            ],
+            "exact_original_excerpt": true
+          },
+          "worker_uid": 2002,
+          "model_calls": 2,
+          "model_metrics": [
+            {
+              "elapsed_seconds": 2.812,
+              "peak_rss_bytes": 1467457536
+            },
+            {
+              "elapsed_seconds": 5.171,
+              "peak_rss_bytes": 1453506560
+            }
+          ],
+          "kind": "document",
+          "original_read_denied": true,
+          "permission_change_denied": true,
+          "private_rpc_denied": true,
+          "public_path_and_export_rejected": true,
+          "original_unchanged": true,
+          "result_exact": true,
+          "confirmed_export_exact": true
+        }
+      ],
+      "protected_source_reused": true,
+      "renamed_source_snapshot_recovered_exactly": true,
+      "symlink_rejected": true,
+      "hardlink_rejected": true,
+      "fifo_rejected": true,
+      "other_identity_denied": true,
+      "existing_export_not_overwritten": true,
+      "open_descriptor_detected_before_plaintext_read": true,
+      "no_automatic_unseal": true,
+      "explicit_private_recovery": true
+    },
+    "service_restart": {
+      "scope": "disposable Linux service restart, not OS reboot or desktop-client acceptance",
+      "fictional_only": true,
+      "cached_real_selftest_reused": true,
+      "readiness_receipt_unchanged": true,
+      "original_and_journal_still_denied": true,
+      "self_test_receipt": {
+        "checks": {
+          "table_values": true,
+          "table_sort": true,
+          "table_new_columns": true,
+          "zero_match": true,
+          "document_selection": true,
+          "document_exact_text": true,
+          "originals_unchanged": true,
+          "os_isolation": true,
+          "real_inference": true
+        },
+        "elapsed_seconds": 9.234,
+        "profile": "compact",
+        "peak_rss_bytes": 1464983552,
+        "local_model_calls": 2,
+        "slow": false,
+        "cloud_data_sent": false,
+        "network": "os_blocked",
+        "human_confirmation": false,
+        "phase": "ready",
+        "fingerprint": "c9506c3f6ec1f48313ad70bd3c7d3b44e2eb39cae429d221855a7028b22c32fd"
+      }
+    },
+    "tested_service_source_sha256": {
+      "broker.py": "5ad2f8ff733fabcdde3b7cb08f35d30977641897c86f91db3542a04660890630",
+      "protocol.py": "9345ba7ecde81aa09fe31864c61da69446d4595dccf437133ea7b090adbd18b7",
+      "posix_store.py": "51dc9aaec7a918191c27a118f1aa896f4eab81a3d5fa4ccdb4459a8a348c41e2",
+      "unix_rpc.py": "b11862b84bf29ac8e0a4318ce2b07e8c265dd3ee4508e24bbec892e8c2961bf4",
+      "service.py": "3162f38c295222b5f169106c95a6b91cf73e70f9fd61c568b99738469f2d100b",
+      "readiness.py": "6dff8c1fea8bfe611828213ba22bd8783964d28d20ada9f75207366ee3a1a7dd",
+      "worker_runner.py": "97d03902e705c3912669148d29b50a750f66bc342bc4a2a685b2095c1b342f53",
+      "linux_enter.py": "25b0bb0ceca38f34a6cf733ca58b5ff891d03b4279b38e2c19ad2b5d68299ad1"
+    }
+  },
+  "not_verified": [
+    "macOS privileged installer and live trusted UI",
+    "Windows ACL/SCM/named-pipe execution",
+    "Windows offline VM and service complete workflow",
+    "WorkBuddy actual client discovery and calls",
+    "physical 8GB device",
+    "OS reboot and interrupted installer recovery",
+    "cross-version upgrade/uninstall",
+    "independent security review"
+  ],
+  "release_gate_tests": {
+    "plan_only_does_not_install": true,
+    "default_unqualified_installation_blocked": true,
+    "unqualified_archive_blocked": true
+  },
+  "ci_status": "prepared locally; not dispatched; external branch push awaiting explicit user authorization"
+}
