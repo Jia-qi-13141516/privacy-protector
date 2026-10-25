@@ -21,13 +21,20 @@ jobs:
       - run: python -B -m unittest discover -s tests/protector -p 'test_*.py' -v
       - shell: pwsh
         run: ./tests/protector/run_windows_probe.ps1
+      - run: python -B tools/prepare_runtime.py
+      - run: python -B tools/build_release.py
+      - name: Windows service installation and restart
+        shell: pwsh
+        run: ./tests/protector/run_windows_probe.ps1 -Service
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
           name: windows-kernel-results
           path: |
             ${{ runner.temp }}/windows-native.json
-            ${{ runner.temp }}/windows-probe.log
+            ${{ runner.temp }}/windows-native.log
+            ${{ runner.temp }}/windows-service.json
+            ${{ runner.temp }}/windows-service.log
           retention-days: 7
   mac-service:
     if: contains(github.event.head_commit.message, '[mac-test]') || github.event_name == 'workflow_dispatch'
