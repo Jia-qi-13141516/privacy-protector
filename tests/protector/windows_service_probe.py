@@ -1,5 +1,5 @@
 """Production Windows SCM lifecycle, disposable GitHub-hosted machines only."""
-import hashlib,json,os,sys,time,uuid
+import hashlib,json,os,re,sys,time,uuid
 from pathlib import Path
 REPO_ROOT=Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(REPO_ROOT/'privacy-assistant/protector'))
@@ -66,6 +66,21 @@ try:
    time.sleep(3)
   diagnostic=installed/'State/Jobs/readiness-error.json'
   if diagnostic.exists():report['private_structural_diagnostic']=json.loads(diagnostic.read_text(encoding='utf-8'))
+  if status.get('phase') not in ('ready','blocked'):
+   # Only fixed VM state fields and error-code tokens leave this synthetic CI.
+   # Do not publish VBox logs, paths, guest credentials or command output.
+   sys.path.insert(0,str(source_root/'scripts'))
+   from vm_backend import Backend
+   try:
+    backend=Backend(installed/'State/Offline');info=backend.info('offline')
+    report['vm_observation']={key:info.get(key) for key in ('VMState','memory','cpus','nic1','hwvirtex','nestedpaging','effectiveparavirtprovider')}
+   except Exception as error:report['vm_observation']={'query_error_type':type(error).__name__}
+   codes=set()
+   for log in (installed/'State/Offline/Machines').rglob('VBox.log'):
+    with log.open('rb') as stream:
+     stream.seek(max(0,log.stat().st_size-262144));data=stream.read(262144).decode('utf-8',errors='ignore')
+    codes.update(re.findall(r'\bVERR_[A-Z0-9_]+\b',data))
+   report['hypervisor_error_codes']=sorted(codes)
   report['automatic_preparation']={'ready':status.get('ready') is True,'phase':status.get('phase'),'code':status.get('code'),'observation_timed_out':status.get('phase') not in ('ready','blocked'),'self_test_passed':status.get('self_test_passed') is True,'business_material_submitted':False}
   report['service']={'production_installer':True,'bundled_interpreter':True,'system_identity_autostart':True,'ordinary_user_config_denied':True,'executable_write_denied':True,'health_rpc':True,'pre_ready_task_rejected':True,'stop_repeat_install_and_restart':True,'first_phase':status.get('phase'),'restart_phase':again.get('phase'),'first_code':status.get('code'),'restart_code':again.get('code'),'vm_processing_tested':False,'interactive_ui_tested':False}
  finally:
