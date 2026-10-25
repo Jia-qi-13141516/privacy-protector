@@ -11,7 +11,7 @@
 
 Privacy Protector（隐私保护Skill）是一个供 AI Agent 调用的本地文件处理工具，用于筛选表格、统计台账和摘录文档。你负责说任务、选文件、核对结果，程序在后台处理。表格由本地程序计算，文档由断网运行的本地模型摘录；原件、处理过程中的文本和结果正文均不发送给云端模型。
 
-> **原件访问隔离尚在平台验收中，当前源码不能作为教师可用的正式安装包。** 独立权限服务、自动安装和受保护入口自检已接入开发代码；Windows、Mac 完整安装和 WorkBuddy 均未实测通过。下方 0.10.0 的说明、演示与结果只适用于该公开版本，它不能阻止原 Agent 使用已有权限读取原件。[访问隔离的实现与核验范围](docs/access-isolation.md)。
+> **原件访问隔离尚在平台验收中，当前源码不能作为教师可用的正式安装包。** 独立权限服务、自动安装和受保护入口自检已接入开发代码；Mac 临时机已跑通后台安装与虚构任务，Windows 已通过文件权限、通信和后台服务安装测试；真实桌面操作、WorkBuddy 与 8GB 设备尚未完成验收。下方 0.10.0 的说明、演示与结果只适用于该公开版本，它不能阻止原 Agent 使用已有权限读取原件。[访问隔离的实现与核验范围](docs/access-isolation.md)。
 
 [下载 0.10.0 完整安装包](https://github.com/Jiaqi-Guo-0114/privacy-protector/releases/download/v0.10.0/privacy-assistant-0.10.0.zip) · [版本说明](https://github.com/Jiaqi-Guo-0114/privacy-protector/releases/tag/v0.10.0)
 

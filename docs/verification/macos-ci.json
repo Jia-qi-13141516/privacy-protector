@@ -1,0 +1,54 @@
+{
+  "run_url": "https://github.com/Jiaqi-Guo-0114/privacy-protector/actions/runs/40207282072",
+  "tested_commit": "b678dae93e432798aacc517d436345a515681666",
+  "scope": "disposable GitHub-hosted macOS; real privileged installer and service; simulated human private RPC, not UI/WorkBuddy acceptance",
+  "fictional_only": true,
+  "architecture": "arm64",
+  "system_version": "14.8.9",
+  "privileged_install_and_registration": true,
+  "real_selftest_receipt": {
+    "checks": {
+      "table_values": true,
+      "table_sort": true,
+      "table_new_columns": true,
+      "zero_match": true,
+      "document_selection": true,
+      "document_exact_text": true,
+      "originals_unchanged": true,
+      "os_isolation": true,
+      "real_inference": true
+    },
+    "elapsed_seconds": 21.585,
+    "profile": "compact",
+    "peak_rss_bytes": 1448919040,
+    "local_model_calls": 2,
+    "slow": false,
+    "cloud_data_sent": false,
+    "network": "os_blocked",
+    "human_confirmation": false,
+    "phase": "ready",
+    "fingerprint": "ffef6e8eb1482f8c8585670072a0556211040069e202f0a6e182a2553eae0003"
+  },
+  "flow": [
+    {
+      "kind": "table",
+      "exact_result": true,
+      "ordinary_agent_original_and_result_denied": true,
+      "confirmed_export_exact": true,
+      "original_still_denied": true
+    },
+    {
+      "kind": "document",
+      "exact_result": true,
+      "ordinary_agent_original_and_result_denied": true,
+      "confirmed_export_exact": true,
+      "original_still_denied": true
+    }
+  ],
+  "repeat_install_and_service_restart": true,
+  "cached_selftest_reused": true,
+  "os_reboot_tested": false,
+  "interactive_ui_tested": false,
+  "workbuddy_tested": false,
+  "physical_8gb_tested": false
+}

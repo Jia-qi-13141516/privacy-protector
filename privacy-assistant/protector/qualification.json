@@ -5,12 +5,13 @@
   "linux_disposable_vm_kernel_and_processing": "passed",
   "protected_readiness_and_service_restart_linux": "passed",
   "macos_arm64_portable_python": "executed_in_temporary_build_tree",
-  "macos_ui": "universal_binary_compiled_only",
-  "macos_privileged_service_end_to_end": "not_tested",
-  "windows_native_access_boundary": "implemented_not_executed_on_windows",
-  "windows_service_installation": "implemented_not_executed_on_windows",
+  "macos_ui": "universal_binary_compiled_interactive_flow_not_tested",
+  "macos_privileged_service_end_to_end": "passed_disposable_arm64_ci_with_simulated_private_ui",
+  "windows_native_access_boundary": "passed_disposable_windows_server_ci",
+  "windows_service_installation": "passed_system_install_and_service_restart_in_disposable_windows_server_ci",
   "workbuddy_end_to_end": "not_tested",
   "physical_8gb_device": "not_tested",
-  "protected_installer_and_first_run_selftest": "integrated_platform_acceptance_pending",
-  "public_release_updated": false
+  "protected_installer_and_first_run_selftest": "macos_arm64_ci_passed_windows_pending",
+  "public_release_updated": false,
+  "windows_automatic_preparation": "not_ready_after_600_second_ci_observation_no_business_material_accepted"
 }

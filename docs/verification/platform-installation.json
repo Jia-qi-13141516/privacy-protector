@@ -167,5 +167,6 @@
     "default_unqualified_installation_blocked": true,
     "unqualified_archive_blocked": true
   },
-  "ci_status": "prepared locally; not dispatched; external branch push awaiting explicit user authorization"
+  "ci_status": "Authorized test branch pushed; see macos-ci.json and platform-ci.json for later platform evidence.",
+  "record_scope": "Historical local and Linux evidence retained with original hashes; later CI results recorded separately."
 }

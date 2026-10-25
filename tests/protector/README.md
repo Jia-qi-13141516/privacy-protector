@@ -21,3 +21,7 @@ python3 -B -m unittest discover -s tests/protector -p 'test_*.py'
 首次启动必须等待 `health.ready` 与 `self_test_passed` 都为真；本轮测试会真实运行虚构表格和文档自检，不注入自检答案。`restart_e2e.py` 在同一临时虚拟机内验证服务重启后复用有效检查且原件仍受保护。
 
 `windows_native_probe.py` 与 `run_windows_probe.ps1` 只允许在一次性 GitHub 托管 Windows 测试机中运行，验证真实 ACL、文件句柄和命名管道身份；不模拟其成功，也不代表 VirtualBox、桌面窗口或 WorkBuddy 已验收。`.github/workflows/platform-validation.yml` 提供调度配置，必须以实际运行结果为准。
+
+`windows_service_probe.py` 配合 `run_windows_probe.ps1 -Service`，在另一进程中验证实际安装器、包内 Python、SYSTEM 服务、自启动配置、配置文件拒绝读取、程序拒绝修改、就绪前任务拒绝、停止与重复安装后启动。它不等待离线虚拟机处理，因此不能作为 Windows 完整任务验收。
+
+`macos_service_probe.py` 只允许在一次性 GitHub 托管 Mac 上以 root 运行，测试真实安装、下载、自检与虚构文件流程。文件选择和导出确认由测试程序通过私有接口模拟，不代表真实桌面窗口或 WorkBuddy 操作已通过。

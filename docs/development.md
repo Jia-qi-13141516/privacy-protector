@@ -76,3 +76,9 @@ python3 tools/render_readme_demo.py \
 ## 访问隔离组件
 
 独立权限组件位于 `privacy-assistant/protector/`，验证范围见 [实现与验收](access-isolation.md)，复现说明见 [隔离测试](../tests/protector/README.md)。它已接入默认安装入口，首次自检与访问权限检查通过前不接受文件；在 `qualification.json` 的发布条件全部满足前，构建器拒绝生成对外安装包。源码测试、临时虚拟机试跑和正式部署是不同状态。
+
+## 平台自动化验证
+
+`codex/platform-installation` 测试分支运行一次性 GitHub 托管机器。Windows 验证文件权限、连续通信、包内运行环境和系统服务生命周期，并记录自动准备是否真正就绪；准备受阻时保持拒绝处理，不把预期拦截当作完整流程通过。Mac 验证实际安装、固定本地模型自检、虚构表格和文档流程、服务重启。真实选文件与确认窗口未由这些测试覆盖。
+
+运行报告见 [平台核验记录](verification/platform-ci.json)。运行状态为绿色只代表所列断言通过，发布资格仍由完整平台验收决定。流程只上传虚构测试结果，不发布安装包，不操作开发者日常电脑。

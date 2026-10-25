@@ -1,0 +1,93 @@
+{
+  "date": "2026-10-25",
+  "development_version": "0.11.0-dev",
+  "release_qualified": false,
+  "branch": "codex/platform-installation",
+  "host_deployment_performed": false,
+  "main_modified": false,
+  "release_published": false,
+  "local_regressions": {
+    "protector": 30,
+    "baseline": 148,
+    "all_passed": true,
+    "environment": "temporary development tree; no product installation",
+    "includes_mock_control_flow": true,
+    "distinct_total": 178,
+    "tested_commit": "25ed7f27bd43899db28ac925904eece85bbb7e1f",
+    "source_notes": "Baseline regression suite executed after the final processing-engine path fix; later changes are CI diagnostic reporting only."
+  },
+  "macos": {
+    "report": "macos-ci.json",
+    "status": "passed_real_install_selftest_tasks_service_restart_with_simulated_private_ui",
+    "tested_commit": "b678dae93e432798aacc517d436345a515681666"
+  },
+  "windows": {
+    "os": "Windows Server 2025 x64 GitHub hosted runner",
+    "tested_commit": "25ed7f27bd43899db28ac925904eece85bbb7e1f",
+    "run_url": "https://github.com/Jiaqi-Guo-0114/privacy-protector/actions/runs/40207602235",
+    "component_tests": {
+      "run": 30,
+      "skipped": 2,
+      "failed": 0
+    },
+    "native": {
+      "os": "Windows",
+      "kernel_acl": true,
+      "ordinary_user_read_before_sealing": true,
+      "ordinary_user_denied_after_sealing": true,
+      "permission_changes_denied": true,
+      "snapshot_denied": true,
+      "confirmed_export_exact": true,
+      "existing_export_preserved": true,
+      "explicit_restore_exact": true,
+      "open_handle_refused": true,
+      "hardlink_refused_before_read": true,
+      "pipe_client_identity": true,
+      "sequential_pipe_requests": 50,
+      "private_pipe_denied": true,
+      "unsafe_server_instance_acl_rejected": true,
+      "fictional_only": true,
+      "ui_tested": false,
+      "offline_vm_processing_tested": false
+    },
+    "service": {
+      "scope": "Windows SCM lifecycle only; no VM processing or interactive desktop acceptance",
+      "fictional_only": true,
+      "automatic_preparation": {
+        "ready": false,
+        "phase": "preparing",
+        "code": null,
+        "observation_timed_out": true,
+        "self_test_passed": false,
+        "business_material_submitted": false
+      },
+      "service": {
+        "production_installer": true,
+        "bundled_interpreter": true,
+        "system_identity_autostart": true,
+        "ordinary_user_config_denied": true,
+        "executable_write_denied": true,
+        "health_rpc": true,
+        "pre_ready_task_rejected": true,
+        "stop_repeat_install_and_restart": true,
+        "first_phase": "preparing",
+        "restart_phase": "preparing",
+        "first_code": null,
+        "restart_code": null,
+        "vm_processing_tested": false,
+        "interactive_ui_tested": false
+      }
+    }
+  },
+  "not_verified": [
+    "Windows full offline VM preparation and actual document/table processing",
+    "Interactive trusted-window file selection and confirmation on either platform",
+    "First system-authorization dialog and cancelled authorization",
+    "Actual WorkBuddy client installation, discovery and complete workflow",
+    "Windows 10/11 desktop computers",
+    "Intel Mac",
+    "Physical 8GB devices",
+    "OS reboot, interrupted installation, cross-version upgrade and uninstall",
+    "Independent security review"
+  ]
+}
