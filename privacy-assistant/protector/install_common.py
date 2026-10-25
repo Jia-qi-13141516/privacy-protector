@@ -1,6 +1,6 @@
 """Checked package copying and explicit install plans; importing never installs."""
 import hashlib,json,os,shutil,stat,tempfile,sys
-from pathlib import Path,PurePosixPath
+from pathlib import Path,PurePosixPath,PureWindowsPath
 VERSION='0.11.0-dev'
 
 def verify_tree(root,expected=None):
@@ -51,7 +51,7 @@ def install_plan(platform,identity,architecture):
     if platform not in ('darwin','win32'):raise ValueError('unsupported_platform')
     if platform=='darwin':
         if architecture not in ('arm64','x86_64'):raise ValueError('unsupported_platform')
-        base=Path('/Library/Application Support/PrivacyProtector');scope='User-'+str(identity)
+        base=PurePosixPath('/Library/Application Support/PrivacyProtector');scope='User-'+str(identity)
         return {'platform':platform,'base':str(base),'app':str(base/'App'/VERSION),'state':str(base/scope),
                 'work':str(base/'Workers'/scope),'socket_dir':'/private/var/run/privacy-protector-'+str(identity),
                 'service':'org.privacyprotector.user'+str(identity),'python':'runtime-macos-'+architecture+'/bin/python3'}
@@ -61,7 +61,7 @@ def install_plan(platform,identity,architecture):
         import ctypes
         buffer=ctypes.create_unicode_buffer(32768)
         if ctypes.windll.shell32.SHGetFolderPathW(None,0x23,None,0,buffer)!=0:raise ValueError('protection_unavailable')
-        base=Path(buffer.value)/'PrivacyProtector'
-    else:base=Path('C:/ProgramData/PrivacyProtector')  # Non-Windows plan tests only.
+        base=PureWindowsPath(buffer.value)/'PrivacyProtector'
+    else:base=PureWindowsPath('C:/ProgramData/PrivacyProtector')  # Non-Windows plan tests only.
     return {'platform':platform,'base':str(base),'app':str(base/'App'/VERSION),'state':str(base/'State'),
             'service':'PrivacyProtector','python':'runtime/python.exe'}
