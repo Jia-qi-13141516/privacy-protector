@@ -7,16 +7,21 @@ if os.environ.get('GITHUB_ACTIONS')!='true' or os.environ.get('RUNNER_ENVIRONMEN
 from windows_native import *
 import windows_rpc as rpc,win32net
 root_only();privilege(win32security.SE_RESTORE_NAME)
-name='pp'+uuid.uuid4().hex[:12];password=uuid.uuid4().hex+'aA1!'
-win32net.NetUserAdd(None,1,{'name':name,'password':password,'priv':1,'home_dir':'','comment':'Disposable synthetic test','flags':0x10001,'script_path':''})
+# Reuse only this disposable runner's active desktop identity. A random user
+# created without a desktop session cannot pass production desktop binding.
 token=None
 try:
- token=win32security.LogonUser(name,'.',password,win32con.LOGON32_LOGON_INTERACTIVE,win32con.LOGON32_PROVIDER_DEFAULT);sid=token_sid(token)
+ session=win32ts.WTSGetActiveConsoleSessionId();assert session!=0xffffffff,'CI desktop unavailable'
+ token=win32ts.WTSQueryUserToken(session)
+ if win32security.GetTokenInformation(token,win32security.TokenElevation):
+  linked=win32security.GetTokenInformation(token,win32security.TokenLinkedToken);token.Close();token=linked
+ assert not win32security.GetTokenInformation(token,win32security.TokenElevation),'ordinary desktop token required'
+ sid=token_sid(token);assert sid!=SYSTEM
  def user_read(p):
   with impersonate(token):
    try:return Path(p).read_bytes()
    except PermissionError:return None
- report={'scope':'Windows SCM lifecycle only; no VM processing or interactive desktop acceptance','fictional_only':True}
+ report={'scope':'Windows production service; private RPC simulates human file selection/confirmation; no interactive UI acceptance','fictional_only':True,'active_desktop_identity':True}
  import install_windows,win32service
  from install_common import install_plan,VERSION
  source_root=REPO_ROOT/'privacy-assistant';manifest=hashlib.sha256((source_root/'release.json').read_bytes()).hexdigest()
@@ -82,7 +87,14 @@ try:
     codes.update(re.findall(r'\bVERR_[A-Z0-9_]+\b',data))
    report['hypervisor_error_codes']=sorted(codes)
   report['automatic_preparation']={'ready':status.get('ready') is True,'phase':status.get('phase'),'code':status.get('code'),'observation_timed_out':status.get('phase') not in ('ready','blocked'),'self_test_passed':status.get('self_test_passed') is True,'business_material_submitted':False}
-  report['service']={'production_installer':True,'bundled_interpreter':True,'system_identity_autostart':True,'ordinary_user_config_denied':True,'executable_write_denied':True,'health_rpc':True,'pre_ready_task_rejected':True,'stop_repeat_install_and_restart':True,'first_phase':status.get('phase'),'restart_phase':again.get('phase'),'first_code':status.get('code'),'restart_code':again.get('code'),'vm_processing_tested':False,'interactive_ui_tested':False}
+  if status.get('ready'):
+   sys.path.insert(0,str(REPO_ROOT/'tests/protector'))
+   from windows_roundtrip import run
+   report['flow']=run(source_root,installed,sid,token)
+   report['real_selftest_receipt']=json.loads((installed/'State/Jobs/readiness.json').read_text(encoding='utf-8'))
+   report['automatic_preparation']['business_material_submitted']=False
+   report['automatic_preparation']['synthetic_tasks_submitted']=True
+  report['service']={'production_installer':True,'bundled_interpreter':True,'system_identity_autostart':True,'ordinary_user_config_denied':True,'executable_write_denied':True,'health_rpc':True,'pre_ready_task_rejected':True,'stop_repeat_install_and_restart':True,'first_phase':status.get('phase'),'restart_phase':again.get('phase'),'first_code':status.get('code'),'restart_code':again.get('code'),'vm_processing_tested':bool(report.get('flow')),'interactive_ui_tested':False}
  finally:
   diagnostic=installed/'State/Jobs/readiness-error.json'
   if diagnostic.exists():print(diagnostic.read_text(encoding='utf-8'),flush=True)
@@ -94,5 +106,3 @@ try:
  Path(sys.argv[1]).write_text(json.dumps(report,indent=2))
 finally:
  if token:token.Close()
- try:win32net.NetUserDel(None,name)
- except Exception:pass
