@@ -52,7 +52,19 @@ try:
    with impersonate(token):reply=rpc.request(rpc.endpoint(sid),{'action':'health'})
    break
   except Exception:
-   if _==29:raise
+   if _==29:
+    # Synthetic CI diagnostics only: record kernel ACL masks, never material or passwords.
+    sd=win32security.GetNamedSecurityInfo(rpc.endpoint(sid),win32security.SE_FILE_OBJECT,SEC|0x10)
+    acl=sd.GetSecurityDescriptorDacl()
+    print(json.dumps({'pipe_owner_system':owner(sd)==SYSTEM,'aces':[{'type':acl.GetAce(i)[0][0],'mask':acl.GetAce(i)[1],'enrolled_sid':win32security.ConvertSidToStringSid(acl.GetAce(i)[2])==sid,'system_sid':win32security.ConvertSidToStringSid(acl.GetAce(i)[2])==SYSTEM} for i in range(acl.GetAceCount())],'sacl':win32security.ConvertSecurityDescriptorToStringSecurityDescriptor(sd,1,0x10)}),flush=True)
+    for mask in (0,win32con.READ_CONTROL,rights.FILE_READ_DATA,rights.FILE_WRITE_DATA,rights.FILE_WRITE_ATTRIBUTES,win32con.SYNCHRONIZE):
+     with impersonate(token):
+      try:
+       handle=win32file.CreateFile(rpc.endpoint(sid),mask,0,None,win32con.OPEN_EXISTING,0,None);handle.Close();outcome='opened'
+      except pywintypes.error as e:outcome=e.winerror
+     print(json.dumps({'desired_access':mask,'result':outcome}),flush=True)
+     time.sleep(.2)
+    raise
    time.sleep(.1)
  assert reply=={'peer_matches':True,'ready':True},reply
  threading.Thread(target=rpc.serve,args=(sid,lambda obj,peer:{'private':True},True),daemon=True).start();time.sleep(.2)
