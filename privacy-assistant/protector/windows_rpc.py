@@ -45,7 +45,7 @@ def request(path,obj,private=False):
     data=json.dumps(obj,ensure_ascii=False).encode()
     if len(data)>protocol.MAX_REQUEST:raise ValueError('invalid_request')
     win32pipe.WaitNamedPipe(str(path),10000)
-    h=win32file.CreateFile(str(path),rights.FILE_READ_DATA|rights.FILE_WRITE_DATA|rights.FILE_WRITE_ATTRIBUTES|win32con.READ_CONTROL|win32con.SYNCHRONIZE,0,None,win32con.OPEN_EXISTING,win32con.SECURITY_SQOS_PRESENT|SECURITY_IDENTIFICATION|win32con.FILE_FLAG_OVERLAPPED,None)
+    h=win32file.CreateFile(str(path),rights.FILE_GENERIC_READ|rights.FILE_WRITE_DATA|rights.FILE_WRITE_ATTRIBUTES,0,None,win32con.OPEN_EXISTING,win32con.SECURITY_SQOS_PRESENT|SECURITY_IDENTIFICATION|win32con.FILE_FLAG_OVERLAPPED,None)
     try:
         server_is_system(h);win32pipe.SetNamedPipeHandleState(h,win32pipe.PIPE_READMODE_MESSAGE,None,None)
         write_message(h,data)
@@ -56,7 +56,7 @@ def serve(sid,handler,private=False):
     # Public task/status IPC accepts the enrolled ordinary (medium-integrity)
     # user. SYSTEM's default integrity label would deny that intended write even
     # with the correct DACL. Private material IPC remains SYSTEM-only.
-    access=rights.FILE_READ_DATA|rights.FILE_WRITE_DATA|rights.FILE_WRITE_ATTRIBUTES|win32con.READ_CONTROL|win32con.SYNCHRONIZE
+    access=rights.FILE_GENERIC_READ|rights.FILE_WRITE_DATA|rights.FILE_WRITE_ATTRIBUTES
     sddl='O:SYG:SYD:(A;;FA;;;SY)'
     if not private:
         win32security.ConvertStringSidToSid(sid)
