@@ -79,4 +79,5 @@ def run(configuration):
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--config',required=True);a=p.parse_args()
     try:run(a.config)
-    except Exception:sys.exit(2)
+    except Exception as error:
+        print(json.dumps({'phase':'blocked','code':protocol.failure(error)['error']}),file=sys.stderr);sys.exit(2)

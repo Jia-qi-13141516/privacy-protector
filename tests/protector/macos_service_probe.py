@@ -22,10 +22,17 @@ def public(obj):
     if r.returncode:raise RuntimeError('public endpoint not ready')
     return json.loads(r.stdout)
 def wait_ready():
-    deadline=time.monotonic()+1200
+    deadline=time.monotonic()+1200;missing_since=time.monotonic();last_phase=None
     while time.monotonic()<deadline:
         try:h=public({'action':'health'})
-        except Exception:time.sleep(2);continue
+        except Exception:
+            if time.monotonic()-missing_since>45:
+                log=Path(plan['state'])/'service.log'
+                if log.exists():print(log.read_text()[-1200:],flush=True)
+                raise RuntimeError('registered service did not open its protected endpoint')
+            time.sleep(2);continue
+        if h.get('phase')!=last_phase:
+            print(json.dumps({'readiness_phase':h.get('phase'),'code':h.get('code')}),flush=True);last_phase=h.get('phase')
         if h.get('phase')=='blocked':raise AssertionError(h)
         if h.get('ready'):
             assert h['self_test_passed'];return h

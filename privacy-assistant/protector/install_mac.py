@@ -57,7 +57,7 @@ def install(source,uid,gid,expected,test=False):
     posix_store.atomic_json(config,value)
     plist=Path('/Library/LaunchDaemons')/(plan['service']+'.plist')
     if plist.is_symlink():raise ValueError('private_store_insecure')
-    contents={'Label':plan['service'],'ProgramArguments':[str(executable),'-I','-B',str(app/'protector/service.py'),'--config',str(config)],'RunAtLoad':True,'KeepAlive':True,'ThrottleInterval':60,'ProcessType':'Background','Umask':0o077,
+    contents={'Label':plan['service'],'ProgramArguments':[str(executable),'-I','-B',str(app/'protector/service.py'),'--config',str(config)],'RunAtLoad':True,'KeepAlive':True,'ThrottleInterval':60,'ProcessType':'Standard','Umask':0o077,
               'StandardOutPath':str(state/'service.log'),'StandardErrorPath':str(state/'service.log')}
     temporary=plist.with_suffix('.new');temporary.write_bytes(plistlib.dumps(contents));temporary.chmod(0o644);os.chown(temporary,0,0);os.replace(temporary,plist)
     cmd(['/bin/launchctl','bootstrap','system',str(plist)])
