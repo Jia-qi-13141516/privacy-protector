@@ -6,17 +6,25 @@ from windows_native import *
 
 def endpoint(sid,private=False):
     return r'\\.\pipe\PrivacyProtector-'+hashlib.sha256(sid.encode()).hexdigest()[:16]+('-private' if private else '-public')
-def server_is_system(handle):
-    sd=win32security.GetSecurityInfo(handle,win32security.SE_FILE_OBJECT,win32security.OWNER_SECURITY_INFORMATION)
-    if owner(sd)!=SYSTEM:raise ValueError('protection_unavailable')
-    pid=win32pipe.GetNamedPipeServerProcessId(handle)
-    process=win32api.OpenProcess(0x1000,False,pid)
-    try:
-        token=win32security.OpenProcessToken(process,win32con.TOKEN_QUERY)
-        try:
-            if token_sid(token)!=SYSTEM:raise ValueError('protection_unavailable')
-        finally:token.Close()
-    finally:process.Close()
+CLIENT_ACCESS=rights.FILE_GENERIC_READ|rights.FILE_WRITE_DATA|rights.FILE_WRITE_ATTRIBUTES
+
+def server_is_system(handle,private=False):
+    # Ordinary users cannot query SYSTEM process tokens. Verify the actual pipe
+    # owner AND the complete DACL instead: no other identity may create server
+    # instances or change ownership/ACLs, so owner checks cannot be spoofed by
+    # adding a second instance under a genuine SYSTEM-owned pipe name.
+    sd=win32security.GetSecurityInfo(handle,win32security.SE_FILE_OBJECT,win32security.OWNER_SECURITY_INFORMATION|win32security.DACL_SECURITY_INFORMATION)
+    acl=sd.GetSecurityDescriptorDacl()
+    if owner(sd)!=SYSTEM or acl is None or acl.GetAceCount()!=(1 if private else 2):raise ValueError('protection_unavailable')
+    system_entries=0
+    for i in range(acl.GetAceCount()):
+        ace=acl.GetAce(i)
+        if ace[0][0]!=0:raise ValueError('protection_unavailable')
+        if win32security.ConvertSidToStringSid(ace[2])==SYSTEM:
+            system_entries+=1
+            if ace[1]!=rights.FILE_ALL_ACCESS:raise ValueError('protection_unavailable')
+        elif private or ace[1]!=CLIENT_ACCESS:raise ValueError('protection_unavailable')
+    if system_entries!=1:raise ValueError('protection_unavailable')
 def io_operation(handle,operation,timeout=10000):
     """Bounded overlapped IO; a connected but silent Agent cannot stall the service."""
     ov=pywintypes.OVERLAPPED();ov.hEvent=win32event.CreateEvent(None,True,False,None)
@@ -47,7 +55,7 @@ def request(path,obj,private=False):
     win32pipe.WaitNamedPipe(str(path),10000)
     h=win32file.CreateFile(str(path),rights.FILE_GENERIC_READ|rights.FILE_WRITE_DATA|rights.FILE_WRITE_ATTRIBUTES,0,None,win32con.OPEN_EXISTING,win32con.SECURITY_SQOS_PRESENT|SECURITY_IDENTIFICATION|win32con.FILE_FLAG_OVERLAPPED,None)
     try:
-        server_is_system(h);win32pipe.SetNamedPipeHandleState(h,win32pipe.PIPE_READMODE_MESSAGE,None,None)
+        server_is_system(h,private);win32pipe.SetNamedPipeHandleState(h,win32pipe.PIPE_READMODE_MESSAGE,None,None)
         write_message(h,data)
         return json.loads(read_message(h,500000 if private else 4096).decode('utf-8'))
     finally:h.Close()

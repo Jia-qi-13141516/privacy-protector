@@ -52,26 +52,24 @@ try:
    with impersonate(token):reply=rpc.request(rpc.endpoint(sid),{'action':'health'})
    break
   except Exception:
-   if _==29:
-    # Synthetic CI diagnostics only: record kernel ACL masks, never material or passwords.
-    sd=win32security.GetNamedSecurityInfo(rpc.endpoint(sid),win32security.SE_FILE_OBJECT,SEC|0x10)
-    acl=sd.GetSecurityDescriptorDacl()
-    print(json.dumps({'pipe_owner_system':owner(sd)==SYSTEM,'aces':[{'type':acl.GetAce(i)[0][0],'mask':acl.GetAce(i)[1],'enrolled_sid':win32security.ConvertSidToStringSid(acl.GetAce(i)[2])==sid,'system_sid':win32security.ConvertSidToStringSid(acl.GetAce(i)[2])==SYSTEM} for i in range(acl.GetAceCount())],'sacl':win32security.ConvertSecurityDescriptorToStringSecurityDescriptor(sd,1,0x10)}),flush=True)
-    for mask in (0,win32con.READ_CONTROL,rights.FILE_READ_DATA,rights.FILE_WRITE_DATA,rights.FILE_WRITE_ATTRIBUTES,win32con.SYNCHRONIZE):
-     with impersonate(token):
-      try:
-       handle=win32file.CreateFile(rpc.endpoint(sid),mask,0,None,win32con.OPEN_EXISTING,0,None);handle.Close();outcome='opened'
-      except pywintypes.error as e:outcome=e.winerror
-     print(json.dumps({'desired_access':mask,'result':outcome}),flush=True)
-     time.sleep(.2)
-    raise
+   if _==29:raise
    time.sleep(.1)
  assert reply=={'peer_matches':True,'ready':True},reply
  threading.Thread(target=rpc.serve,args=(sid,lambda obj,peer:{'private':True},True),daemon=True).start();time.sleep(.2)
  with impersonate(token):
   try:rpc.request(rpc.endpoint(sid,True),{'action':'review','id':'a'*32},private=True);raise AssertionError('private pipe accepted')
   except pywintypes.error as e:assert e.winerror==5,e
- report={'os':'Windows','kernel_acl':True,'ordinary_user_read_before_sealing':True,'ordinary_user_denied_after_sealing':True,'permission_changes_denied':True,'snapshot_denied':True,'confirmed_export_exact':True,'existing_export_preserved':True,'explicit_restore_exact':True,'open_handle_refused':True,'pipe_client_identity':True,'private_pipe_denied':True,'fictional_only':True,'ui_tested':False,'offline_vm_processing_tested':False}
+ # A SYSTEM-owned pipe is insufficient if clients can create additional
+ # server instances. Validate the actual kernel descriptor against this attack.
+ unsafe=rpc.endpoint(sid)+'-unsafe'
+ sd=win32security.ConvertStringSecurityDescriptorToSecurityDescriptor('O:SYG:SYD:(A;;FA;;;SY)(A;;0x'+format(rpc.CLIENT_ACCESS|4,'x')+';;;'+sid+')S:(ML;;NW;;;ME)',1)
+ sa=pywintypes.SECURITY_ATTRIBUTES();sa.SECURITY_DESCRIPTOR=sd
+ bad=win32pipe.CreateNamedPipe(unsafe,win32pipe.PIPE_ACCESS_DUPLEX,win32pipe.PIPE_TYPE_MESSAGE|win32pipe.PIPE_READMODE_MESSAGE|8,1,1024,1024,1000,sa)
+ try:
+  try:rpc.server_is_system(bad);raise AssertionError('unsafe instance-creation ACL accepted')
+  except ValueError as e:assert str(e)=='protection_unavailable'
+ finally:bad.Close()
+ report={'os':'Windows','kernel_acl':True,'ordinary_user_read_before_sealing':True,'ordinary_user_denied_after_sealing':True,'permission_changes_denied':True,'snapshot_denied':True,'confirmed_export_exact':True,'existing_export_preserved':True,'explicit_restore_exact':True,'open_handle_refused':True,'pipe_client_identity':True,'private_pipe_denied':True,'unsafe_server_instance_acl_rejected':True,'fictional_only':True,'ui_tested':False,'offline_vm_processing_tested':False}
  Path(sys.argv[1]).write_text(json.dumps(report,indent=2))
 finally:
  if token:token.Close()
