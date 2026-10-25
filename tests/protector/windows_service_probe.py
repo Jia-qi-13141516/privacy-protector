@@ -1,8 +1,8 @@
 """Production Windows SCM lifecycle, disposable GitHub-hosted machines only."""
 import hashlib,json,os,sys,time,uuid
 from pathlib import Path
-ROOT=Path(__file__).resolve().parents[2]
-sys.path.insert(0,str(ROOT/'privacy-assistant/protector'))
+REPO_ROOT=Path(__file__).resolve().parents[2]
+sys.path.insert(0,str(REPO_ROOT/'privacy-assistant/protector'))
 if os.environ.get('GITHUB_ACTIONS')!='true' or os.environ.get('RUNNER_ENVIRONMENT')!='github-hosted':raise SystemExit('disposable CI only')
 from windows_native import *
 import windows_rpc as rpc,win32net
@@ -19,7 +19,7 @@ try:
  report={'scope':'Windows SCM lifecycle only; no VM processing or interactive desktop acceptance','fictional_only':True}
  import install_windows,win32service
  from install_common import install_plan,VERSION
- source_root=ROOT/'privacy-assistant';manifest=hashlib.sha256((source_root/'release.json').read_bytes()).hexdigest()
+ source_root=REPO_ROOT/'privacy-assistant';manifest=hashlib.sha256((source_root/'release.json').read_bytes()).hexdigest()
  installed=Path(install_plan('win32',sid,'AMD64')['base'])
  assert not installed.exists(),'fresh runner required'
  manager=win32service.OpenSCManager(None,None,win32service.SC_MANAGER_ALL_ACCESS);svc=None
@@ -55,7 +55,7 @@ try:
    assert time.monotonic()<until,'service stop timeout';time.sleep(.2)
   repeat=install_windows.install(source_root,sid,manifest,test=True);assert repeat['service_registered']
   again=health();assert again.get('ready') is False,again
-  report['service']={'production_installer':True,'bundled_interpreter':True,'system_identity_autostart':True,'ordinary_user_config_denied':True,'executable_write_denied':True,'health_rpc':True,'pre_ready_task_rejected':True,'stop_repeat_install_and_restart':True,'first_phase':status.get('phase'),'restart_phase':again.get('phase'),'vm_processing_tested':False,'interactive_ui_tested':False}
+  report['service']={'production_installer':True,'bundled_interpreter':True,'system_identity_autostart':True,'ordinary_user_config_denied':True,'executable_write_denied':True,'health_rpc':True,'pre_ready_task_rejected':True,'stop_repeat_install_and_restart':True,'first_phase':status.get('phase'),'restart_phase':again.get('phase'),'first_code':status.get('code'),'restart_code':again.get('code'),'vm_processing_tested':False,'interactive_ui_tested':False}
  finally:
   if svc:
    try:win32service.ControlService(svc,win32service.SERVICE_CONTROL_STOP)
