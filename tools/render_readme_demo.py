@@ -37,7 +37,7 @@ def tick(d,x,y,r=12,color=TEAL):
 
 def base(title,subtitle,chapter):
  im=Image.new('RGB',(W,H),BG);d=ImageDraw.Draw(im)
- txt(d,(48,26),'隐私保护 Skill  /  0.10.0',21,TEAL)
+ txt(d,(48,26),'Privacy Protector · 隐私保护Skill  /  0.10.0',21,TEAL)
  pill(d,(984,24),'示意动画',AMBER,AP);pill(d,(1110,24),'虚构材料',MUTED,'#E9EFF2')
  txt(d,(48,86),title,40)
  txt(d,(48,151),subtitle,22,MUTED)

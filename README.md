@@ -1,4 +1,4 @@
-# 隐私保护Skill
+# Privacy Protector · 隐私保护Skill
 
 **用 AI 处理工作材料时，你是否也有这些顾虑？**
 
@@ -9,9 +9,9 @@
 
 **表格处理、文档摘录、自动自检，一套 Skill 在本地完成。**
 
-隐私保护Skill 是一个供 AI Agent 调用的本地文件处理工具，用于筛选表格、统计台账和摘录文档。你负责说任务、选文件、核对结果，程序在后台处理。表格由本地程序计算，文档由断网运行的本地模型摘录；原件、处理过程中的文本和结果正文均不发送给云端模型。
+Privacy Protector（隐私保护Skill）是一个供 AI Agent 调用的本地文件处理工具，用于筛选表格、统计台账和摘录文档。你负责说任务、选文件、核对结果，程序在后台处理。表格由本地程序计算，文档由断网运行的本地模型摘录；原件、处理过程中的文本和结果正文均不发送给云端模型。
 
-[下载 0.10.0 完整安装包](https://github.com/Jiaqi-Guo-0114/privacy-assistant/releases/download/v0.10.0/privacy-assistant-0.10.0.zip) · [版本说明](https://github.com/Jiaqi-Guo-0114/privacy-assistant/releases/tag/v0.10.0)
+[下载 0.10.0 完整安装包](https://github.com/Jiaqi-Guo-0114/privacy-protector/releases/download/v0.10.0/privacy-assistant-0.10.0.zip) · [版本说明](https://github.com/Jiaqi-Guo-0114/privacy-protector/releases/tag/v0.10.0)
 
 > **0.10.0 为公开测试版。** 已在 Apple M5、24GiB 内存的 Mac 上实测。**8GB 电脑、Windows / WorkBuddy 和 Intel Mac 尚未完成实机验收**，不能保证这些设备上的安装、速度和完整流程。
 
@@ -28,7 +28,7 @@
 
 ## 45 秒了解处理流程
 
-![隐私保护Skill 0.10.0：自动自检、表格处理与文档摘录](docs/assets/privacy-workflow.gif)
+![Privacy Protector 0.10.0：自动自检、表格处理与文档摘录](docs/assets/privacy-workflow.gif)
 
 **虚构材料实测，画面为重绘示意，不是软件界面录屏。** 自动自检9项通过；8条记录筛出5条、合计21份；6段纪要摘出第2、3、6段，与原文逐字一致。表格由程序计算，文档实际调用本地模型2次。
 
@@ -42,7 +42,7 @@
 
 **方式二：让 Agent 读取链接。** 直接发送：
 
-> 请读取 https://github.com/Jiaqi-Guo-0114/privacy-assistant/blob/main/SKILL.md ，按说明下载、校验并安装隐私保护Skill，完成虚构材料自检。
+> 请读取 https://github.com/Jiaqi-Guo-0114/privacy-protector/blob/main/SKILL.md ，按说明下载、校验并安装隐私保护Skill，完成虚构材料自检。
 
 首次需要下载约 **1.1GB** 模型。程序自动配置省内存参数、运行虚构材料自检；通过后才能处理正式材料。后续复用已安装的组件和有效的自检结果，不要求重新登录 Agent。Windows 首次安装仍可能出现系统管理员授权或要求重启。
 
@@ -95,4 +95,4 @@ Mac 使用禁止联网的数据处理进程；Windows 代码通过无网卡的�
 
 代码采用 [Apache 2.0](LICENSE)，原创文档、Skill 指令和流程图采用 [CC BY 4.0](LICENSE-CC-BY-4.0)。[第三方组件](THIRD_PARTY_NOTICES.md)保留各自许可。
 
-[报告问题](https://github.com/Jiaqi-Guo-0114/privacy-assistant/issues)请使用虚构样例，不附真实个人资料、凭据或身份映射。[源码构建](docs/development.md)
+[报告问题](https://github.com/Jiaqi-Guo-0114/privacy-protector/issues)请使用虚构样例，不附真实个人资料、凭据或身份映射。[源码构建](docs/development.md)

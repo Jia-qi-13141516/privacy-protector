@@ -5,7 +5,7 @@ metadata:
   version: "0.10.0"
 ---
 
-# 隐私保护Skill
+# Privacy Protector · 隐私保护Skill
 
 用户要求安装本仓库时，完成以下步骤，不让用户选择技术参数。
 
