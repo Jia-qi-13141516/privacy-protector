@@ -29,11 +29,11 @@ def _pearson_compat(x, y):
 """
 s=p.read_text().replace('def stats(rows, cols):',compat+'def stats(rows, cols):').replace('corr=statistics.correlation(x,y)','corr=(statistics.correlation(x,y) if hasattr(statistics,"correlation") else _pearson_compat(x,y))')
 p.write_text(s)
-core_files={str(p.relative_to(r/'skill')):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted((r/'skill').rglob('*')) if p.is_file() and p.name!='package_manifest.json'}
+core_files={p.relative_to(r/'skill').as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted((r/'skill').rglob('*')) if p.is_file() and p.name!='package_manifest.json'}
 (r/'skill/package_manifest.json').write_text(json.dumps(core_files,indent=2))
 for p in r.rglob('__pycache__'):shutil.rmtree(p)
 for p in (r/'scripts').glob('*.py'):ast.parse(p.read_text())
-files={str(p.relative_to(r)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(r.rglob('*')) if p.is_file() and p.name!='release.json' and '__pycache__' not in p.parts}
+files={p.relative_to(r).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(r.rglob('*')) if p.is_file() and p.name!='release.json' and '__pycache__' not in p.parts}
 (r/'release.json').write_text(json.dumps({'version':'0.11.0-dev','files':files},indent=2))
 if args.archive:
  with zipfile.ZipFile(archive,'w',zipfile.ZIP_DEFLATED) as z:

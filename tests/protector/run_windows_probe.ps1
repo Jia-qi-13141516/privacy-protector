@@ -1,9 +1,12 @@
+param([switch]$Service)
 $ErrorActionPreference='Stop'
 if ($env:GITHUB_ACTIONS -ne 'true' -or $env:RUNNER_ENVIRONMENT -ne 'github-hosted') { throw 'Disposable CI only' }
 $python=(Get-Command python).Source
-$script=Join-Path $PSScriptRoot 'windows_native_probe.py'
-$report=Join-Path $env:RUNNER_TEMP 'windows-native.json'
-$log=Join-Path $env:RUNNER_TEMP 'windows-probe.log'
+$probe=if ($Service) { 'windows_service_probe.py' } else { 'windows_native_probe.py' }
+$kind=if ($Service) { 'windows-service' } else { 'windows-native' }
+$script=Join-Path $PSScriptRoot $probe
+$report=Join-Path $env:RUNNER_TEMP ($kind+'.json')
+$log=Join-Path $env:RUNNER_TEMP ($kind+'.log')
 $wrapper=Join-Path $env:RUNNER_TEMP 'pp-system-probe.cmd'
 # No credentials are written here; the Python probe creates a random disposable user.
 @"
@@ -17,7 +20,7 @@ try {
  $action=New-ScheduledTaskAction -Execute "$env:WINDIR\System32\cmd.exe" -Argument ('/c "'+$wrapper+'"')
  Register-ScheduledTask -TaskName $task -Action $action -User 'SYSTEM' -RunLevel Highest -Force | Out-Null
  Start-ScheduledTask -TaskName $task
- $deadline=(Get-Date).AddMinutes(3)
+ $deadline=(Get-Date).AddMinutes(5)
  do {
   Start-Sleep -Seconds 2
   $state=(Get-ScheduledTask -TaskName $task).State

@@ -6,6 +6,13 @@ sys.path.insert(0,str(ROOT/'privacy-assistant/protector'))
 if os.environ.get('GITHUB_ACTIONS')!='true' or os.environ.get('RUNNER_ENVIRONMENT')!='github-hosted':raise SystemExit('disposable CI only')
 from windows_native import *
 import windows_store as store,windows_rpc as rpc,win32net
+# Diagnostic tracebacks are confined to synthetic CI, never the public protocol.
+import traceback
+failure=rpc.protocol.failure
+def diagnostic_failure(error):
+ traceback.print_exception(type(error),error,error.__traceback__)
+ return failure(error)
+rpc.protocol.failure=diagnostic_failure
 root_only();privilege(win32security.SE_RESTORE_NAME)
 base=Path('C:/')/('PrivacyProtectorTest-'+uuid.uuid4().hex);base.mkdir()
 name='pp'+uuid.uuid4().hex[:12];password=uuid.uuid4().hex+'aA1!'

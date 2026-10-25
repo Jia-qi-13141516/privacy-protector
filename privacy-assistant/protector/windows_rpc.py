@@ -81,7 +81,7 @@ def serve(sid,handler,private=False):
                 if e.winerror!=535:raise
             try:
                 data=read_message(pipe,8193)
-                win32pipe.ImpersonateNamedPipeClient(pipe)
+                win32security.ImpersonateNamedPipeClient(pipe)
                 try:
                     token=win32security.OpenThreadToken(win32api.GetCurrentThread(),win32con.TOKEN_QUERY,True)
                     try:
