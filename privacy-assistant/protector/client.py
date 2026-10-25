@@ -5,7 +5,8 @@ sys.path.insert(0,str(Path(__file__).parent))
 import protocol
 
 def endpoint():
-    if sys.platform in ('darwin','linux'):return Path('/private/var/run' if sys.platform=='darwin' else '/run')/('privacy-protector-'+str(os.getuid()))/'public.sock'
+    if sys.platform=='darwin':return Path('/Library/Application Support/PrivacyProtector/IPC')/str(os.getuid())/'public.sock'
+    if sys.platform=='linux':return Path('/run')/('privacy-protector-'+str(os.getuid()))/'public.sock'
     if sys.platform=='win32':
         from windows_rpc import endpoint as windows_endpoint
         from windows_native import current_sid

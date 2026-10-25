@@ -53,7 +53,7 @@ def install_plan(platform,identity,architecture):
         if architecture not in ('arm64','x86_64'):raise ValueError('unsupported_platform')
         base=PurePosixPath('/Library/Application Support/PrivacyProtector');scope='User-'+str(identity)
         return {'platform':platform,'base':str(base),'app':str(base/'App'/VERSION),'state':str(base/scope),
-                'work':str(base/'Workers'/scope),'socket_dir':'/private/var/run/privacy-protector-'+str(identity),
+                'work':str(base/'Workers'/scope),'socket_dir':str(base/'IPC'/str(identity)),
                 'service':'org.privacyprotector.user'+str(identity),'python':'runtime-macos-'+architecture+'/bin/python3'}
     if architecture.lower() not in ('amd64','x86_64'):raise ValueError('windows_x64_required')
     # Do not trust an Agent-supplied ProgramData environment variable for a SYSTEM service.

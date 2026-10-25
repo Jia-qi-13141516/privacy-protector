@@ -53,11 +53,16 @@ def request(path,obj,private=False):
     finally:h.Close()
 def serve(sid,handler,private=False):
     root_only();name=endpoint(sid,private)
-    sd=win32security.SECURITY_DESCRIPTOR();sd.SetSecurityDescriptorOwner(win32security.ConvertStringSidToSid(SYSTEM),False)
-    acl=win32security.ACL();acl.AddAccessAllowedAce(win32security.ACL_REVISION,rights.FILE_ALL_ACCESS,win32security.ConvertStringSidToSid(SYSTEM))
+    # Public task/status IPC accepts the enrolled ordinary (medium-integrity)
+    # user. SYSTEM's default integrity label would deny that intended write even
+    # with the correct DACL. Private material IPC remains SYSTEM-only.
+    access=rights.FILE_READ_DATA|rights.FILE_WRITE_DATA|rights.FILE_WRITE_ATTRIBUTES|win32con.READ_CONTROL|win32con.SYNCHRONIZE
+    sddl='O:SYG:SYD:(A;;FA;;;SY)'
     if not private:
-        acl.AddAccessAllowedAce(win32security.ACL_REVISION,rights.FILE_READ_DATA|rights.FILE_WRITE_DATA|rights.FILE_WRITE_ATTRIBUTES|win32con.READ_CONTROL|win32con.SYNCHRONIZE,win32security.ConvertStringSidToSid(sid))
-    sd.SetSecurityDescriptorDacl(1,acl,0);sa=pywintypes.SECURITY_ATTRIBUTES();sa.SECURITY_DESCRIPTOR=sd
+        win32security.ConvertStringSidToSid(sid)
+        sddl+='(A;;0x'+format(access,'x')+';;;'+sid+')S:(ML;;NW;;;ME)'
+    sd=win32security.ConvertStringSecurityDescriptorToSecurityDescriptor(sddl,1)
+    sa=pywintypes.SECURITY_ATTRIBUTES();sa.SECURITY_DESCRIPTOR=sd
     while True:
         pipe=win32pipe.CreateNamedPipe(name,win32pipe.PIPE_ACCESS_DUPLEX|0x00080000|win32con.FILE_FLAG_OVERLAPPED,
               win32pipe.PIPE_TYPE_MESSAGE|win32pipe.PIPE_READMODE_MESSAGE|win32pipe.PIPE_WAIT|8,1,500000,8193,10000,sa)
