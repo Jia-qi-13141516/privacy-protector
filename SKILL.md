@@ -1,22 +1,21 @@
 ---
 name: privacy-assistant
-description: 下载并安装隐私保护Skill，或打开已安装的本地助手。只读取安装包，原始表格必须由本地窗口选择。
+description: 下载、校验并安装隐私保护Skill，在本地后台处理表格或摘录文档；只读取安装包和状态，不把真实材料交给云端模型。
 metadata:
-  version: "0.7.0"
+  version: "0.10.0"
 ---
 
 # 隐私保护Skill
 
-用户要求安装本仓库的 Skill 时，自动获取完整安装包，不让用户手工配置运行环境。
+用户要求安装本仓库时，完成以下步骤，不让用户选择技术参数。
 
-1. 读取本目录 `release-lock.json`，从其中固定的 HTTPS 地址下载 ZIP 到新的本地临时目录。只允许该仓库的 Release 地址及 GitHub 官方资产重定向，不接受替换来源；下载大小不得超过锁文件上限。
-2. 计算 ZIP 的 SHA-256，必须与锁文件一致后才能解压或执行。下载或校验失败则停止，不执行未核验的文件。Windows 可使用自带 PowerShell 的下载、散列与解压命令，无需先安装 Python。
-3. 解压后，读取包内 `privacy-assistant/SKILL.md`。Windows 使用包内 `runtime/python.exe -I -B scripts/auto_setup.py --agent workbuddy|codex|claude`，按当前本地客户端选参数，工作目录为解压后的 `privacy-assistant`。
-   macOS 使用 Python 3.9 或更新版本执行 `python3 -B scripts/auto_setup.py --agent codex`，若已安装的是 Claude Code 则用 `--agent claude`。先检查 Python 与相应命令行客户端能运行；缺失时使用其官方安装渠道完成安装，不改用原 WorkBuddy 界面读取原表。系统授权和首次登录交本人完成。
-4. 安装器完成后台配置和本地自检。首次系统授权与服务商登录由本人操作；不要索取或迁移登录凭据。以程序回执为准，开始安装不等于已经启用隔离。
+1. 读取本目录 `release-lock.json`，把其中完整 ZIP 下载到新的本地临时目录。仅接受锁定的本仓库 HTTPS Release 地址及 GitHub 官方资产重定向，限制下载大小。先核对 SHA-256，一致后才解压、执行；失败即停止。
+2. 读取解压后的 `privacy-assistant/SKILL.md`。在该目录执行 `scripts/auto_setup.py --agent codex|claude|workbuddy`，根据当前客户端选定参数。Windows 使用包内 `runtime/python.exe -I -B`；Mac 使用 Python 3.9+。不追加 `--open`，不启用旧向导。Mac 缺少 Python 时使用官方安装渠道，遇到系统授权或单位限制如实说明，不绕过。
+3. 等待本机 `Settings/background-setup.json`。只有 `phase: ready` 且 `self_test_passed: true` 才报告自检通过；安装已启动不等于可用。`self_testing` 时继续等待；`blocked` 时说明固定 `message`。复用记录不能说成重新试跑。
+4. 后续使用已安装的后台入口提交任务。只传本地路径和任务，不读取真实原件；未提供路径时让程序打开本地文件选择器。只读取任务状态，返回本地结果链接，不读取真实结果、映射、日志或代号稿。
 
-完整安装包已带有运行库。再次打开时使用本机已安装的启动入口，保留运行磁盘与账号资料。失败不能改走不隔离模式，也不能让用户上传原表替代。
+完整包自动准备本地组件，首次模型下载约1.1GB，之后复用。任务自动排队，资源或保护检查失败时停止；不切换云端、不降低保护、不让教师手工调参。无需重新登录原Agent；Windows首次系统管理员授权或重启仍需本人完成，不索取或迁移凭据。
 
-Windows 发起安装的入口可以是 WorkBuddy、Codex 或 Claude Code；受保护工作环境统一使用独立 WorkBuddy。主机上的当前聊天窗口不会因此被隔离。macOS 使用本地选表和确认窗口，以及新启动的 Codex / Claude Code 命令行进程隔离；Mac WorkBuddy 原界面不受隔离。纯云端 Agent 没有本机执行通道时不能完成本地部署。
+0.10.0为公开测试版：已在Apple M5 / 24GiB Mac上实测；8GB电脑、Windows / WorkBuddy和Intel Mac尚未完成实机验收。不可把代码适配或模拟测试说成整机通过。纯云端Agent没有本机执行通道时无法安装。此流程不撤销宿主Agent原有文件权限。
 
-仅接触安装包和固定状态回执。不要读取原表、身份映射或实名成果；实际使用通过“本地选文件 → 在受保护会话说任务 → 本地确认结果”完成。范围与验证状态见 `README.md` 和 `docs/compatibility.md`。
+能力、用法与边界见 `README.md`；不要承诺任意表格分析、生成式文档改写或自动提交业务系统。

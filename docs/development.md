@@ -51,7 +51,7 @@ python3 tools/build_readme_demo.py
 
 ## 功能模块
 
-`privacy-assistant/features/table/` 和 `features/document/` 共用后台入口，按本地文件后缀自动分流。旧版手动向导和云端交换代码仅保留为兼容实现，不由0.9.0默认入口启动。
+`privacy-assistant/features/table/` 和 `features/document/` 共用后台入口，按本地文件后缀自动分流。旧版手动向导和云端交换代码仅保留为兼容实现，不由0.10.0默认入口启动。
 
 ## 0.10.0 后台入口
 
