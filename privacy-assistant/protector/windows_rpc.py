@@ -57,7 +57,8 @@ def request(path,obj,private=False):
     try:
         server_is_system(h,private);win32pipe.SetNamedPipeHandleState(h,win32pipe.PIPE_READMODE_MESSAGE,None,None)
         write_message(h,data)
-        return json.loads(read_message(h,500000 if private else 4096).decode('utf-8'))
+        reply=json.loads(read_message(h,500000 if private else 4096).decode('utf-8'))
+        write_message(h,b'\x06');return reply
     finally:h.Close()
 def serve(sid,handler,private=False):
     root_only();name=endpoint(sid,private)
@@ -92,6 +93,9 @@ def serve(sid,handler,private=False):
                 reply=handler(protocol.decode(data),0 if private else peer)
             except Exception as e:reply=protocol.failure(e)
             write_message(pipe,json.dumps(reply,ensure_ascii=False).encode())
+            # Disconnect would discard an unread reply; a bounded receipt avoids
+            # FlushFileBuffers' unbounded wait on an untrusted client.
+            if read_message(pipe,1)!=b'\x06':raise ValueError('ipc_failed')
         except (pywintypes.error,ValueError):pass
         finally:
             try:win32pipe.DisconnectNamedPipe(pipe)
