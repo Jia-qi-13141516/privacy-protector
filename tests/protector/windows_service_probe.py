@@ -69,6 +69,8 @@ try:
   report['automatic_preparation']={'ready':status.get('ready') is True,'phase':status.get('phase'),'code':status.get('code'),'observation_timed_out':status.get('phase') not in ('ready','blocked'),'self_test_passed':status.get('self_test_passed') is True,'business_material_submitted':False}
   report['service']={'production_installer':True,'bundled_interpreter':True,'system_identity_autostart':True,'ordinary_user_config_denied':True,'executable_write_denied':True,'health_rpc':True,'pre_ready_task_rejected':True,'stop_repeat_install_and_restart':True,'first_phase':status.get('phase'),'restart_phase':again.get('phase'),'first_code':status.get('code'),'restart_code':again.get('code'),'vm_processing_tested':False,'interactive_ui_tested':False}
  finally:
+  diagnostic=installed/'State/Jobs/readiness-error.json'
+  if diagnostic.exists():print(diagnostic.read_text(encoding='utf-8'),flush=True)
   if svc:
    try:win32service.ControlService(svc,win32service.SERVICE_CONTROL_STOP)
    except pywintypes.error:pass

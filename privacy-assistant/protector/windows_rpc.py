@@ -73,32 +73,33 @@ def serve(sid,handler,private=False):
         sddl+='(A;;0x'+format(access,'x')+';;;'+sid+')S:(ML;;NW;;;ME)'
     sd=win32security.ConvertStringSecurityDescriptorToSecurityDescriptor(sddl,1)
     sa=pywintypes.SECURITY_ATTRIBUTES();sa.SECURITY_DESCRIPTOR=sd
-    while True:
-        pipe=win32pipe.CreateNamedPipe(name,win32pipe.PIPE_ACCESS_DUPLEX|0x00080000|win32con.FILE_FLAG_OVERLAPPED,
-              win32pipe.PIPE_TYPE_MESSAGE|win32pipe.PIPE_READMODE_MESSAGE|win32pipe.PIPE_WAIT|8,1,500000,8193,10000,sa)
-        try:
-            try:io_operation(pipe,lambda ov:win32pipe.ConnectNamedPipe(pipe,ov),win32event.INFINITE)
-            except pywintypes.error as e:
-                if e.winerror!=535:raise
+    pipe=win32pipe.CreateNamedPipe(name,win32pipe.PIPE_ACCESS_DUPLEX|0x00080000|win32con.FILE_FLAG_OVERLAPPED,
+          win32pipe.PIPE_TYPE_MESSAGE|win32pipe.PIPE_READMODE_MESSAGE|win32pipe.PIPE_WAIT|8,1,500000,8193,10000,sa)
+    try:
+        while True:
             try:
-                data=read_message(pipe,8193)
-                win32security.ImpersonateNamedPipeClient(pipe)
+                try:io_operation(pipe,lambda ov:win32pipe.ConnectNamedPipe(pipe,ov),win32event.INFINITE)
+                except pywintypes.error as e:
+                    if e.winerror!=535:raise
                 try:
-                    token=win32security.OpenThreadToken(win32api.GetCurrentThread(),win32con.TOKEN_QUERY,True)
+                    data=read_message(pipe,8193)
+                    win32security.ImpersonateNamedPipeClient(pipe)
                     try:
-                        peer=token_sid(token)
-                        if not private and win32security.GetTokenInformation(token,win32security.TokenElevation):raise ValueError('forbidden')
-                    finally:token.Close()
-                finally:win32security.RevertToSelf()
-                if (private and peer!=SYSTEM) or (not private and peer!=sid):raise ValueError('forbidden')
-                reply=handler(protocol.decode(data),0 if private else peer)
-            except Exception as e:reply=protocol.failure(e)
-            write_message(pipe,json.dumps(reply,ensure_ascii=False).encode())
-            # Disconnect would discard an unread reply; a bounded receipt avoids
-            # FlushFileBuffers' unbounded wait on an untrusted client.
-            if read_message(pipe,1)!=b'\x06':raise ValueError('ipc_failed')
-        except (pywintypes.error,ValueError):pass
-        finally:
-            try:win32pipe.DisconnectNamedPipe(pipe)
-            except pywintypes.error:pass
-            pipe.Close()
+                        token=win32security.OpenThreadToken(win32api.GetCurrentThread(),win32con.TOKEN_QUERY,True)
+                        try:
+                            peer=token_sid(token)
+                            if not private and win32security.GetTokenInformation(token,win32security.TokenElevation):raise ValueError('forbidden')
+                        finally:token.Close()
+                    finally:win32security.RevertToSelf()
+                    if (private and peer!=SYSTEM) or (not private and peer!=sid):raise ValueError('forbidden')
+                    reply=handler(protocol.decode(data),0 if private else peer)
+                except Exception as e:reply=protocol.failure(e)
+                write_message(pipe,json.dumps(reply,ensure_ascii=False).encode())
+                # Disconnect would discard an unread reply; a bounded receipt avoids
+                # FlushFileBuffers' unbounded wait on an untrusted client.
+                if read_message(pipe,1)!=b'\x06':raise ValueError('ipc_failed')
+            except (pywintypes.error,ValueError):pass
+            finally:
+                try:win32pipe.DisconnectNamedPipe(pipe)
+                except pywintypes.error:pass
+    finally:pipe.Close()
