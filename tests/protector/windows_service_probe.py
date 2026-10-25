@@ -55,6 +55,16 @@ try:
    assert time.monotonic()<until,'service stop timeout';time.sleep(.2)
   repeat=install_windows.install(source_root,sid,manifest,test=True);assert repeat['service_registered']
   again=health();assert again.get('ready') is False,again
+  # Observe the real automatic preparation outcome. A blocked environment is
+  # reported as blocked, never as a completed document/table workflow.
+  deadline=time.monotonic()+600;last_phase=None
+  while True:
+   status=health()
+   if status.get('phase')!=last_phase:
+    print(json.dumps({'readiness_phase':status.get('phase'),'code':status.get('code')}),flush=True);last_phase=status.get('phase')
+   if status.get('phase') in ('ready','blocked') or time.monotonic()>=deadline:break
+   time.sleep(3)
+  report['automatic_preparation']={'ready':status.get('ready') is True,'phase':status.get('phase'),'code':status.get('code'),'observation_timed_out':status.get('phase') not in ('ready','blocked'),'self_test_passed':status.get('self_test_passed') is True,'business_material_submitted':False}
   report['service']={'production_installer':True,'bundled_interpreter':True,'system_identity_autostart':True,'ordinary_user_config_denied':True,'executable_write_denied':True,'health_rpc':True,'pre_ready_task_rejected':True,'stop_repeat_install_and_restart':True,'first_phase':status.get('phase'),'restart_phase':again.get('phase'),'first_code':status.get('code'),'restart_code':again.get('code'),'vm_processing_tested':False,'interactive_ui_tested':False}
  finally:
   if svc:

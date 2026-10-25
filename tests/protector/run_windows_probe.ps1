@@ -20,7 +20,7 @@ try {
  $action=New-ScheduledTaskAction -Execute "$env:WINDIR\System32\cmd.exe" -Argument ('/c "'+$wrapper+'"')
  Register-ScheduledTask -TaskName $task -Action $action -User 'SYSTEM' -RunLevel Highest -Force | Out-Null
  Start-ScheduledTask -TaskName $task
- $deadline=(Get-Date).AddMinutes(5)
+ $deadline=(Get-Date).AddMinutes($(if ($Service) { 12 } else { 3 }))
  do {
   Start-Sleep -Seconds 2
   $state=(Get-ScheduledTask -TaskName $task).State
