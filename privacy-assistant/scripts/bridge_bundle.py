@@ -16,7 +16,7 @@ def files(root):
     library=root/'runtime/Lib/site-packages'
     for path in sorted((library/'pypdf').rglob('*')):
         if path.is_file() and '__pycache__' not in path.parts and path.suffix!='.pyc':
-            result['/opt/privacy-bridge/'+str(path.relative_to(library))]=path.read_bytes()
+            result['/opt/privacy-bridge/'+path.relative_to(library).as_posix()]=path.read_bytes()
     for path in library.glob('pypdf-*.dist-info/licenses/LICENSE'):
         result['/opt/privacy-bridge/vendor-licenses/pypdf-LICENSE']=path.read_bytes()
     if not any('/pypdf/' in key for key in result):raise ValueError('pdf_runtime_missing')

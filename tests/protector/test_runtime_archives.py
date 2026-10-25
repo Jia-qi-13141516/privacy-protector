@@ -1,5 +1,5 @@
 """TAR paths retain POSIX semantics even while a Windows host prepares a guest."""
-import io,sys,tarfile,tempfile,unittest
+import io,shutil,sys,tarfile,tempfile,unittest
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]/'privacy-assistant'
 sys.path.insert(0,str(ROOT/'scripts'))
@@ -21,4 +21,19 @@ class ArchivePaths(unittest.TestCase):
             with self.subTest(target=target),tempfile.TemporaryDirectory() as folder:
                 with self.assertRaisesRegex(ValueError,'runtime_archive_invalid'):
                     list(local_runtime.archive_files(self.archive(folder,target)))
+class GuestBundlePaths(unittest.TestCase):
+    def test_guest_library_paths_use_posix_names_on_windows(self):
+        import bridge_bundle
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder)
+            shutil.copytree(ROOT/'scripts',root/'scripts',ignore=shutil.ignore_patterns('__pycache__'))
+            (root/'backend').mkdir()
+            for name in ('local-model.json','guest_rpc.py','guest_health.py','acceptance_guest.py','guest_skill.md'):
+                shutil.copy2(ROOT/'backend'/name,root/'backend'/name)
+            for name in ('skill/scripts/deidentify.py','runtime/Lib/site-packages/pypdf/__init__.py'):
+                p=root/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(b'# synthetic fixture')
+            values=bridge_bundle.files(root)
+            self.assertEqual(values['/opt/privacy-bridge/pypdf/__init__.py'],b'# synthetic fixture')
+            self.assertTrue(all('\\' not in name for name in values))
+
 if __name__=='__main__':unittest.main()
