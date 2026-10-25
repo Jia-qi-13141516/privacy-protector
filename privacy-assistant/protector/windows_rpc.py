@@ -45,7 +45,7 @@ def request(path,obj,private=False):
     data=json.dumps(obj,ensure_ascii=False).encode()
     if len(data)>protocol.MAX_REQUEST:raise ValueError('invalid_request')
     win32pipe.WaitNamedPipe(str(path),10000)
-    h=win32file.CreateFile(str(path),win32con.FILE_READ_DATA|win32con.FILE_WRITE_DATA|win32con.FILE_WRITE_ATTRIBUTES|win32con.READ_CONTROL|win32con.SYNCHRONIZE,0,None,win32con.OPEN_EXISTING,win32con.SECURITY_SQOS_PRESENT|win32con.SECURITY_IDENTIFICATION|win32con.FILE_FLAG_OVERLAPPED,None)
+    h=win32file.CreateFile(str(path),rights.FILE_READ_DATA|rights.FILE_WRITE_DATA|rights.FILE_WRITE_ATTRIBUTES|win32con.READ_CONTROL|win32con.SYNCHRONIZE,0,None,win32con.OPEN_EXISTING,win32con.SECURITY_SQOS_PRESENT|SECURITY_IDENTIFICATION|win32con.FILE_FLAG_OVERLAPPED,None)
     try:
         server_is_system(h);win32pipe.SetNamedPipeHandleState(h,win32pipe.PIPE_READMODE_MESSAGE,None,None)
         write_message(h,data)
@@ -54,9 +54,9 @@ def request(path,obj,private=False):
 def serve(sid,handler,private=False):
     root_only();name=endpoint(sid,private)
     sd=win32security.SECURITY_DESCRIPTOR();sd.SetSecurityDescriptorOwner(win32security.ConvertStringSidToSid(SYSTEM),False)
-    acl=win32security.ACL();acl.AddAccessAllowedAce(win32security.ACL_REVISION,win32con.FILE_ALL_ACCESS,win32security.ConvertStringSidToSid(SYSTEM))
+    acl=win32security.ACL();acl.AddAccessAllowedAce(win32security.ACL_REVISION,rights.FILE_ALL_ACCESS,win32security.ConvertStringSidToSid(SYSTEM))
     if not private:
-        acl.AddAccessAllowedAce(win32security.ACL_REVISION,win32con.FILE_READ_DATA|win32con.FILE_WRITE_DATA|win32con.FILE_WRITE_ATTRIBUTES|win32con.READ_CONTROL|win32con.SYNCHRONIZE,win32security.ConvertStringSidToSid(sid))
+        acl.AddAccessAllowedAce(win32security.ACL_REVISION,rights.FILE_READ_DATA|rights.FILE_WRITE_DATA|rights.FILE_WRITE_ATTRIBUTES|win32con.READ_CONTROL|win32con.SYNCHRONIZE,win32security.ConvertStringSidToSid(sid))
     sd.SetSecurityDescriptorDacl(1,acl,0);sa=pywintypes.SECURITY_ATTRIBUTES();sa.SECURITY_DESCRIPTOR=sd
     while True:
         pipe=win32pipe.CreateNamedPipe(name,win32pipe.PIPE_ACCESS_DUPLEX|0x00080000|win32con.FILE_FLAG_OVERLAPPED,

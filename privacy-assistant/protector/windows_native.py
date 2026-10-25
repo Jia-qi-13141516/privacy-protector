@@ -6,6 +6,10 @@ ROOT=Path(__file__).resolve().parents[1]
 lib=ROOT/'runtime/Lib/site-packages'
 sys.path[:0]=[str(lib),str(lib/'win32'),str(lib/'win32/lib'),str(lib/'Pythonwin')]
 _DLL=os.add_dll_directory(str(lib/'pywin32_system32')) if (lib/'pywin32_system32').is_dir() else None
+import ntsecuritycon as rights
+# winbase.h CreateFile flags, absent from pywin32 win32con.
+FILE_FLAG_OPEN_REPARSE_POINT=0x00200000
+SECURITY_IDENTIFICATION=0x00010000
 import pywintypes,win32api,win32con,win32file,win32security,win32pipe,win32process,win32ts
 SYSTEM='S-1-5-18'
 SEC=win32security.OWNER_SECURITY_INFORMATION|win32security.GROUP_SECURITY_INFORMATION|win32security.DACL_SECURITY_INFORMATION
@@ -33,11 +37,11 @@ def impersonate(token):
     try:yield
     finally:win32security.RevertToSelf()
 def system_acl():
-    acl=win32security.ACL();acl.AddAccessAllowedAceEx(win32security.ACL_REVISION,win32con.OBJECT_INHERIT_ACE|win32con.CONTAINER_INHERIT_ACE,win32con.FILE_ALL_ACCESS,win32security.ConvertStringSidToSid(SYSTEM));return acl
+    acl=win32security.ACL();acl.AddAccessAllowedAceEx(win32security.ACL_REVISION,win32con.OBJECT_INHERIT_ACE|win32con.CONTAINER_INHERIT_ACE,rights.FILE_ALL_ACCESS,win32security.ConvertStringSidToSid(SYSTEM));return acl
 
 def protect(path,readable=False):
     root_only();acl=system_acl()
-    if readable:acl.AddAccessAllowedAceEx(win32security.ACL_REVISION,3,win32con.FILE_GENERIC_READ|win32con.FILE_GENERIC_EXECUTE,win32security.CreateWellKnownSid(win32security.WinBuiltinUsersSid,None))
+    if readable:acl.AddAccessAllowedAceEx(win32security.ACL_REVISION,3,rights.FILE_GENERIC_READ|rights.FILE_GENERIC_EXECUTE,win32security.CreateWellKnownSid(win32security.WinBuiltinUsersSid,None))
     win32security.SetNamedSecurityInfo(str(path),win32security.SE_FILE_OBJECT,win32security.OWNER_SECURITY_INFORMATION|win32security.DACL_SECURITY_INFORMATION|win32security.PROTECTED_DACL_SECURITY_INFORMATION,win32security.ConvertStringSidToSid(SYSTEM),None,acl,None)
 
 def local_path(path):
@@ -54,9 +58,9 @@ def anchored(path,access=win32con.GENERIC_READ,exclusive=False):
         # Keeping every ancestor open without FILE_SHARE_DELETE prevents renames
         # and reparse-point swaps while the leaf is inspected/changed/read.
         for parent in reversed(p.parents):
-            h=win32file.CreateFile(str(parent),win32con.FILE_READ_ATTRIBUTES,3,None,win32con.OPEN_EXISTING,win32con.FILE_FLAG_BACKUP_SEMANTICS|win32con.FILE_FLAG_OPEN_REPARSE_POINT,None);parents.append(h)
+            h=win32file.CreateFile(str(parent),rights.FILE_READ_ATTRIBUTES,3,None,win32con.OPEN_EXISTING,win32con.FILE_FLAG_BACKUP_SEMANTICS|FILE_FLAG_OPEN_REPARSE_POINT,None);parents.append(h)
             if win32file.GetFileInformationByHandle(h)[0]&win32con.FILE_ATTRIBUTE_REPARSE_POINT:raise ValueError('linked_source')
-        handle=win32file.CreateFile(str(p),access,0 if exclusive else 7,None,win32con.OPEN_EXISTING,win32con.FILE_FLAG_OPEN_REPARSE_POINT,None)
+        handle=win32file.CreateFile(str(p),access,0 if exclusive else 7,None,win32con.OPEN_EXISTING,FILE_FLAG_OPEN_REPARSE_POINT,None)
         info=win32file.GetFileInformationByHandle(handle)
         if info[0]&(win32con.FILE_ATTRIBUTE_REPARSE_POINT|win32con.FILE_ATTRIBUTE_DIRECTORY) or info[7]!=1:raise ValueError('linked_source')
         yield handle,info
@@ -72,14 +76,14 @@ def descriptor(handle):return win32security.GetSecurityInfo(handle,win32security
 def owner(sd):return win32security.ConvertSidToStringSid(sd.GetSecurityDescriptorOwner())
 def private_descriptor(sd):
     acl=sd.GetSecurityDescriptorDacl()
-    return owner(sd)==SYSTEM and acl is not None and acl.GetAceCount()==1 and win32security.ConvertSidToStringSid(acl.GetAce(0)[2])==SYSTEM and acl.GetAce(0)[0][0]==0 and acl.GetAce(0)[1]==win32con.FILE_ALL_ACCESS
+    return owner(sd)==SYSTEM and acl is not None and acl.GetAceCount()==1 and win32security.ConvertSidToStringSid(acl.GetAce(0)[2])==SYSTEM and acl.GetAce(0)[0][0]==0 and acl.GetAce(0)[1]==rights.FILE_ALL_ACCESS
 
 
 def assert_installed_tree(root):
     """All service-importable files are SYSTEM owned, users read/execute only."""
     root_only();root=local_path(root)
     user_sid=win32security.ConvertSidToStringSid(win32security.CreateWellKnownSid(win32security.WinBuiltinUsersSid,None))
-    allowed={SYSTEM:win32con.FILE_ALL_ACCESS,user_sid:win32con.FILE_GENERIC_READ|win32con.FILE_GENERIC_EXECUTE}
+    allowed={SYSTEM:rights.FILE_ALL_ACCESS,user_sid:rights.FILE_GENERIC_READ|rights.FILE_GENERIC_EXECUTE}
     for p in (root.parent.parent,root.parent,root,*root.rglob('*')):
         if win32file.GetFileAttributes(str(p))&win32con.FILE_ATTRIBUTE_REPARSE_POINT:raise ValueError('private_store_insecure')
         sd=win32security.GetNamedSecurityInfo(str(p),win32security.SE_FILE_OBJECT,SEC);acl=sd.GetSecurityDescriptorDacl()

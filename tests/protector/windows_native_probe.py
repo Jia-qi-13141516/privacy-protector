@@ -17,7 +17,7 @@ try:
   assert uid==sid
   return win32security.DuplicateTokenEx(token,win32security.SecurityImpersonation,win32con.TOKEN_ALL_ACCESS,win32security.TokenPrimary)
  store.USER_TOKEN=dup
- acl=system_acl();acl.AddAccessAllowedAceEx(win32security.ACL_REVISION,3,win32con.FILE_ALL_ACCESS,win32security.ConvertStringSidToSid(sid))
+ acl=system_acl();acl.AddAccessAllowedAceEx(win32security.ACL_REVISION,3,rights.FILE_ALL_ACCESS,win32security.ConvertStringSidToSid(sid))
  win32security.SetNamedSecurityInfo(str(base),win32security.SE_FILE_OBJECT,win32security.DACL_SECURITY_INFORMATION|win32security.PROTECTED_DACL_SECURITY_INFORMATION,None,None,acl,None)
  private=base/'private';private.mkdir();protect(private);job=private/'job';job.mkdir();protect(job)
  source=base/'fictional.csv';data=b'id,name,count\n001,SYNTHETIC_ONLY,3\n'

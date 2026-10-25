@@ -16,7 +16,7 @@ def bootstrap_acl(path,private):
     # to SYSTEM now; ordinary Agent tokens never own the service or its state.
     privilege(win32security.SE_RESTORE_NAME);privilege(win32security.SE_TAKE_OWNERSHIP_NAME)
     acl=system_acl()
-    if not private:acl.AddAccessAllowedAceEx(win32security.ACL_REVISION,3,win32con.FILE_GENERIC_READ|win32con.FILE_GENERIC_EXECUTE,win32security.CreateWellKnownSid(win32security.WinBuiltinUsersSid,None))
+    if not private:acl.AddAccessAllowedAceEx(win32security.ACL_REVISION,3,rights.FILE_GENERIC_READ|rights.FILE_GENERIC_EXECUTE,win32security.CreateWellKnownSid(win32security.WinBuiltinUsersSid,None))
     win32security.SetNamedSecurityInfo(str(path),win32security.SE_FILE_OBJECT,win32security.OWNER_SECURITY_INFORMATION|win32security.DACL_SECURITY_INFORMATION|win32security.PROTECTED_DACL_SECURITY_INFORMATION,win32security.ConvertStringSidToSid(SYSTEM),None,acl,None)
 
 def install(source,sid,expected,test=False):

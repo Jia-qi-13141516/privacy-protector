@@ -37,7 +37,7 @@ def owner_id(path):
         sid=owner(descriptor(h));return 0 if sid==SYSTEM else sid
 
 def file_identity(path):
-    with anchored(path,win32con.FILE_READ_ATTRIBUTES) as (h,info):return identity(info)
+    with anchored(path,rights.FILE_READ_ATTRIBUTES) as (h,info):return identity(info)
 
 def denied_as_user(path,uid,gid=None):
     root_only();token=user_token(uid)
@@ -45,7 +45,7 @@ def denied_as_user(path,uid,gid=None):
         with impersonate(token):
             for access in (win32con.GENERIC_READ,win32con.WRITE_DAC,win32con.WRITE_OWNER):
                 try:
-                    h=win32file.CreateFile(str(path),access,7,None,win32con.OPEN_EXISTING,win32con.FILE_FLAG_OPEN_REPARSE_POINT,None);h.Close();return False
+                    h=win32file.CreateFile(str(path),access,7,None,win32con.OPEN_EXISTING,FILE_FLAG_OPEN_REPARSE_POINT,None);h.Close();return False
                 except pywintypes.error as error:
                     if error.winerror!=5:return False
         return True
@@ -105,7 +105,7 @@ def export_file(source,destination,uid,gid=None):
     try:
         with impersonate(token):
             for parent in reversed(dest.parents):
-                h=win32file.CreateFile(str(parent),win32con.FILE_READ_ATTRIBUTES,3,None,win32con.OPEN_EXISTING,win32con.FILE_FLAG_BACKUP_SEMANTICS|win32con.FILE_FLAG_OPEN_REPARSE_POINT,None);parents.append(h)
+                h=win32file.CreateFile(str(parent),rights.FILE_READ_ATTRIBUTES,3,None,win32con.OPEN_EXISTING,win32con.FILE_FLAG_BACKUP_SEMANTICS|FILE_FLAG_OPEN_REPARSE_POINT,None);parents.append(h)
                 if win32file.GetFileInformationByHandle(h)[0]&win32con.FILE_ATTRIBUTE_REPARSE_POINT:raise ValueError('export_target_invalid')
             out=win32file.CreateFile(str(dest),win32con.GENERIC_WRITE,0,None,win32con.CREATE_NEW,win32con.FILE_ATTRIBUTE_NORMAL,None)
             try:win32file.WriteFile(out,data);win32file.FlushFileBuffers(out)
