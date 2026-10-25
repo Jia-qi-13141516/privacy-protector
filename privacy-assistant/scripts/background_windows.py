@@ -3,6 +3,7 @@ import base64,json,subprocess
 from pathlib import Path
 import task_channel as ch
 import local_runtime
+import performance
 from vm_backend import Backend,preflight,install_engine
 from component_download import digest
 
@@ -11,6 +12,11 @@ ROOT=Path(__file__).resolve().parents[1]
 
 def prepare(base,progress):
     preflight(base)
+    # Account for the VM's existing allocation instead of requiring it twice.
+    existing=Backend(base)
+    entry=existing.state['machines'].get('offline',{})
+    running=bool(entry.get('ready') and existing.info('offline').get('VMState')=='running')
+    performance.require_capacity(performance.hardware(),vm_running=running)
     config=local_runtime.install(base,'linux-x86_64',progress)
     backend=Backend(base,install_engine(base,progress));backend.provision(progress,roles=('offline',))
     info=backend.info('offline')
@@ -30,12 +36,15 @@ def prepare(base,progress):
         if backend.guest('offline','/usr/bin/python3',['-I','-c',code],timeout=600).strip()!='local_runtime_ready':raise ValueError('runtime_integrity')
         entry['local_model_version']=expected;backend.save()
     if backend.rpc('offline',{'action':'health'}).get('status')!='offline':raise ValueError('isolation_failed')
+    backend.rpc('offline',{'action':'resource_health'})
     return backend
 
 
-def execute(base,task,request,progress):
+def execute(base,task,request,progress,backend=None):
     # Provisioning/downloads happen before loading any source bytes.
-    backend=prepare(base,progress);source=Path(request['source'])
+    backend=backend or prepare(base,progress);source=Path(request['source'])
+    performance.require_capacity(performance.hardware(),vm_running=True)
+    backend.rpc('offline',{'action':'resource_health'})
     from windows_service import safe_source
     raw=safe_source(source,document=source.suffix.lower() not in ('.csv','.xlsx'))
     progress('processing_offline',0,0)

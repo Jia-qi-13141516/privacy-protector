@@ -12,6 +12,16 @@ TASKS=Path('/var/lib/privacy-tasks')
 QUEUE=Path('/home/teacher/PrivacyTasks')
 
 def offline(request):
+    if request.get('action') in ('resource_health','self_test'):
+        from background_worker import require_offline
+        import performance
+        require_offline()
+        performance.require_capacity(performance.hardware(),guest=True)
+        if request=={'action':'resource_health'}:return {'status':'offline','memory_ready':True}
+        if set(request)!={'action','id'} or request['action']!='self_test':raise ValueError('invalid_request')
+        task=TASKS/task_id(request['id']);task.mkdir(parents=True,mode=0o700)
+        from self_check import run_offline
+        return run_offline(task,get_json(Path('/opt/privacy-local/config.json')))
     if request.get('action')=='background_task':
         if set(request)!={'action','id','extension','data','instruction'}:raise ValueError('invalid_request')
         from background_worker import require_offline,execute
@@ -97,6 +107,8 @@ def main():
                'result_mismatch','duplicate_identity','unauthorized_change','numeric_invalid','job_mismatch'}
         from document_engine import ERROR_MESSAGES
         known.update(ERROR_MESSAGES)
+        from performance import ERROR_MESSAGES as PERFORMANCE_ERRORS
+        known.update(PERFORMANCE_ERRORS)
         return {'error':str(error) if str(error) in known else 'local_operation_failed'}
 
 if __name__=='__main__':

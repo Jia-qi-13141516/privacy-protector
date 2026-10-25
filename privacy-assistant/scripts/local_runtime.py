@@ -2,6 +2,7 @@
 import hashlib,json,os,platform,shutil,subprocess,tarfile,tempfile
 from pathlib import Path,PurePosixPath
 import task_channel as ch
+import performance
 from component_download import fetch,digest
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -80,7 +81,7 @@ def verify(config):
 class LocalModel:
     def __init__(self,config,task):
         self.binary,self.model=verify(config)
-        self.task=task;self.calls=0
+        self.task=task;self.calls=0;self.metrics=[]
 
     def ask(self,system,user,schema):
         # Fixed executable and arguments, never a shell or model-proposed code.
@@ -88,16 +89,16 @@ class LocalModel:
         prompt=self.task/('prompt-'+str(self.calls)+'.txt')
         ch.write(prompt,('<|im_start|>system\n'+system+'<|im_end|>\n<|im_start|>user\n'+user+'<|im_end|>\n<|im_start|>assistant\n').encode(),True)
         grammar=self.task/('schema-'+str(self.calls)+'.json');ch.put_json(grammar,schema,True)
-        command=[str(self.binary),'-m',str(self.model),'-f',str(prompt),'-n','1024','-c','8192','-ngl','0',
-                 '--device','none','--no-op-offload','--no-kv-offload',
+        profile=performance.PROFILE
+        command=[str(self.binary),'-m',str(self.model),'-f',str(prompt),'-n','1024','-c',str(profile['context']),'-ngl','0',
+                 '-b',str(profile['batch']),'-ub',str(profile['ubatch']),'-t',str(profile['threads']),'-tb',str(profile['threads']),
+                 '--device','none','--no-op-offload','--no-kv-offload','--no-repack',
                  '--temp','0','--seed','42','--no-display-prompt','--no-conversation','--simple-io',
                  '--json-schema-file',str(grammar)]
-        completed=subprocess.run(command,stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.PIPE,
-                                 timeout=600,close_fds=True,env={k:os.environ[k] for k in ('PATH','HOME','TMPDIR','LANG') if k in os.environ})
         # All model output/logs remain inside this offline private job.
-        ch.write(self.task/('inference-'+str(self.calls)+'.log'),completed.stderr,True)
-        if completed.returncode:raise ValueError('local_inference_failed')
-        text=completed.stdout.decode('utf-8',errors='strict').strip()
+        output=self.task/('inference-'+str(self.calls)+'.out')
+        self.metrics.append(performance.inference(command,output,self.task/('inference-'+str(self.calls)+'.log')))
+        text=ch.read(output,2*1024*1024).decode('utf-8',errors='strict').strip()
         start=text.find('{');end=text.rfind('}')
         if start<0 or end<start:raise ValueError('local_inference_invalid')
         result=json.loads(text[start:end+1])

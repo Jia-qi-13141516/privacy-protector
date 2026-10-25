@@ -53,8 +53,10 @@ python3 tools/build_readme_demo.py
 
 `privacy-assistant/features/table/` 和 `features/document/` 共用后台入口，按本地文件后缀自动分流。旧版手动向导和云端交换代码仅保留为兼容实现，不由0.9.0默认入口启动。
 
-## 0.9.0 后台入口
+## 0.10.0 后台入口
 
 使用 `scripts/background.py submit --input <虚构文件> --task <任务>` 提交，用 `status --id <编号>` 读取完成状态。公开回复不含原文、脱敏稿或映射。数据处理由 `background_worker.py` 在OS断网环境执行；表格计算在 `background_engine.py`，文档调用固定的本地推理程序。
 
 完整分享包需包含三种平台的推理压缩包及许可证。运行 `python3 tools/bundle_local_runtime.py` 下载、核对并打包这些固定组件，再运行 `python3 tools/build_release.py --archive`。模型权重不进Git或ZIP，由首次安装从固定ModelScope版本下载。运行 `python3 -m unittest discover -s tests -p 'test_*.py' -v`；真实模型验收单独记录，不能用单元测试或模拟输出替代。
+
+首次验收由 `self_check.py` 在实际断网环境调用表格/文档引擎与本地模型。`performance.py` 自动检查可用内存并监测推理进程；运行资源超限、超时、输出不一致或隔离失败都不能写入ready。版本和运行参数变更使旧检查失效。硬件边界测试中的8GB信息是模拟输入，必须与真实模型试跑、8GB实机验收区分。

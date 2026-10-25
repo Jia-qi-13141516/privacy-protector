@@ -14,7 +14,7 @@ ROOT=Path(__file__).resolve().parents[1]
 CORE=ROOT/'skill'
 sys.path.insert(0,str(CORE/'scripts'))
 sys.path.insert(0,str(ROOT/'runtime/Lib/site-packages'))
-VERSION='0.9.0'
+VERSION='0.10.0'
 AGENTS=('workbuddy','codex','claude')
 
 

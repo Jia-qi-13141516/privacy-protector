@@ -9,7 +9,8 @@ ROOT=Path(__file__).resolve().parents[1]
 
 def run(args,timeout=120):
     # No payload or raw stderr is ever returned to the Agent or placed in a log.
-    p=subprocess.Popen([str(x) for x in args],stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL)
+    p=subprocess.Popen([str(x) for x in args],stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,
+                       creationflags=0x08000000 if sys.platform=='win32' else 0)
     import threading
     result=[];overflow=[]
     def reader():
@@ -44,7 +45,7 @@ def preflight(base):
     if not (details['hypervisor'] or details['virtualization']):raise ValueError('firmware_virtualization_disabled')
     statefile=base/'Settings/persistent-vm.json'
     state=get_json(statefile) if statefile.exists() else {}
-    ready=all(state.get('machines',{}).get(role,{}).get('ready') for role in ('online','offline'))
+    ready=bool(state.get('machines',{}).get('offline',{}).get('ready'))
     if shutil.disk_usage(base).free<(1 if ready else 12)*1024**3:raise ValueError('disk_space_insufficient')
 
 def install_engine(base,progress):
@@ -83,7 +84,7 @@ if ($p.ExitCode -ne 0) { exit 4 }
     ps=base/'Settings/install-engine.ps1';ps.write_text(script,encoding='utf-8-sig')
     command=base64.b64encode(('& {\n'+script+'\n} -Request '+"'"+str(request).replace("'","''")+"'").encode('utf-16le')).decode()
     # Execution policy is not changed; the encoded reviewed wrapper uses a signed vendor exe.
-    result=subprocess.run(['powershell.exe','-NoProfile','-EncodedCommand',command],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+    result=subprocess.run(['powershell.exe','-NoProfile','-EncodedCommand',command],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,creationflags=0x08000000)
     if result.returncode==10:raise ValueError('restart_required')
     if result.returncode or not exe.is_file():raise ValueError('engine_install_not_completed')
     return exe
@@ -135,7 +136,9 @@ class Backend:
         try:
             remote='/var/lib/privacy-control/'+identifier+'.json'
             self.cli('guestcontrol',self.state['machines'][role]['id'],'copyto',*self.credentials(role),str(local),remote)
-            reply=json.loads(self.guest(role,'/usr/bin/python3',['-I','/opt/privacy-bridge/guest_rpc.py',identifier],timeout=3600 if request.get('action')=='background_task' else 120))
+            if request.get('action')=='self_test':
+                reply=json.loads(self.guest(role,'/usr/bin/timeout',['--kill-after=5s','185s','/usr/bin/python3','-I','/opt/privacy-bridge/guest_rpc.py',identifier],timeout=200))
+            else:reply=json.loads(self.guest(role,'/usr/bin/python3',['-I','/opt/privacy-bridge/guest_rpc.py',identifier],timeout=3600 if request.get('action')=='background_task' else 120))
         finally:local.unlink(missing_ok=True)
         if not isinstance(reply,dict) or 'error' in reply:raise ValueError(reply.get('error','guest_response_invalid') if isinstance(reply,dict) else 'guest_response_invalid')
         return reply

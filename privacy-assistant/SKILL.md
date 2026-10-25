@@ -2,7 +2,7 @@
 name: privacy-assistant
 description: 在本地后台处理含个人信息的表格和文档。自动安装断网处理组件，支持表格筛选统计与身份回填、文档提取式摘要和待办整理；原件及结果正文不交给云端模型。
 metadata:
-  version: "0.9.0"
+  version: "0.10.0"
 ---
 
 # 隐私保护Skill
@@ -12,6 +12,10 @@ metadata:
 ## 安装
 
 只读取安装包。在包根目录运行 `scripts/auto_setup.py --agent codex`（当前客户端为 Claude Code / WorkBuddy 时改为 `claude` / `workbuddy`）。Mac 用 Python 3.9+；Windows 用包内 `runtime/python.exe -I -B`。不要追加 `--open`。安装在后台完成，首次下载约 1.1 GB 的本地模型；模型来自 ModelScope 的官方 Qwen 仓库，文件散列固定。Mac 和 Windows/Linux 的推理程序随完整 ZIP 提供。
+
+首次安装后，程序自动检查总内存与当前可用内存，在同一断网边界内用虚构表格和文档试跑、核验导出，并测量真实模型推理的内存与时间。自检通过前不得读取业务文件；任何任务入口也会检查此条件，不能跳过。默认使用省内存参数并串行处理任务，保留同一模型和8K上下文。不得让教师选择配置档或手工调参。
+
+安装状态只读安装目录 `Settings/background-setup.json`。`ready` 且 `self_test_passed: true` 才可报告本机自检通过；`self_test_reused` 表示复用本机同版本检查，不能说成重新试跑。`self_testing` 表示仍在试跑，`blocked` 时向用户解释返回的 `message`，不忽略错误、不更换到联网路径或放松隔离。内存不足时可提示关闭占内存的应用后重试，无需技术配置。
 
 安装状态只读安装目录 `Settings/background-setup.json`。`background_installation_started` 表示已启动，不等于完成。Windows 首次配置虚拟机仍可能需要操作系统的管理员授权或重启；不能绕过系统策略，也不能把操作系统授权说成已经自动通过。原 Agent 的账号资料不变，不创建第二个在线聊天环境。
 

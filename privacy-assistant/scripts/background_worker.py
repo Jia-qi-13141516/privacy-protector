@@ -21,22 +21,30 @@ def require_offline():
     else:raise ValueError('isolation_failed')
 
 
-def execute(task,source,instruction,config):
-    require_offline()
-    import local_runtime,background_engine as engine
-    if not isinstance(instruction,str) or not 1<=len(instruction)<=2000:raise ValueError('task_invalid')
-    model=local_runtime.LocalModel(config,task)
-    binary=str(model.binary)
+def install_execution_guard(binary):
     def audit(event,args):
         if event.startswith('socket.') or event in ('os.system','os.exec','os.posix_spawn'):raise ValueError('isolation_failed')
         if event=='subprocess.Popen' and str(args[0])!=binary:raise ValueError('isolation_failed')
     sys.addaudithook(audit)
+
+
+def execute(task,source,instruction,config):
+    require_offline()
+    import local_runtime,background_engine as engine
+    if sys.platform=='linux':
+        import performance
+        performance.require_capacity(performance.hardware(),guest=True)
+    if not isinstance(instruction,str) or not 1<=len(instruction)<=2000:raise ValueError('task_invalid')
+    model=local_runtime.LocalModel(config,task)
+    install_execution_guard(str(model.binary))
     suffix=source.suffix.lower()
     if suffix not in ('.xlsx','.csv','.txt','.md','.docx','.pdf'):raise ValueError('document_format')
     raw=ch.read(source,20*1024*1024 if suffix in ('.xlsx','.csv') else 5*1024*1024)
     snapshot=task/('original'+suffix);ch.write(snapshot,raw,True)
     digest=hashlib.sha256(raw).hexdigest();del raw
     result=(engine.table_job if suffix in ('.xlsx','.csv') else engine.document_job)(snapshot,task,instruction,model)
+    result['performance']={'profile':'compact','model_calls':model.metrics,
+                           'peak_rss_bytes':max([m['peak_rss_bytes'] for m in model.metrics] or [0])}
     if hashlib.sha256(ch.read(snapshot)).hexdigest()!=digest:raise ValueError('source_changed')
     ch.put_json(task/'receipt.json',{'input_sha256':digest,'network':'os_blocked','cloud_data_sent':False,
                 'model':'Qwen2.5-1.5B-Instruct-Q4_K_M','human_confirmation':False,**result},True)
@@ -47,7 +55,10 @@ def main():
     try:
         require_offline() # Before reading the private request or any source file.
         task=Path(sys.argv[1]);request=ch.get_json(task/'request.json')
-        result=execute(task,Path(request['source']),request['instruction'],request['runtime'])
+        if request.get('action')=='self_test':
+            from self_check import run_offline
+            result=run_offline(task,request['runtime'])
+        else:result=execute(task,Path(request['source']),request['instruction'],request['runtime'])
         print(json.dumps({'phase':'completed',**result}));return 0
     except Exception as e:
         from background import safe_error

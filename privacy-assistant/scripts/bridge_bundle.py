@@ -7,7 +7,7 @@ from zipfile import ZipFile,ZIP_DEFLATED
 def files(root):
     result={}
     for name in ('task_channel.py','guest_client.py','table_wizard.py','network_policy.py','document_engine.py',
-                 'local_runtime.py','component_download.py','background_engine.py','background_worker.py'):
+                 'local_runtime.py','component_download.py','background_engine.py','background_worker.py','performance.py','self_check.py'):
         result['/opt/privacy-bridge/'+name]=(root/'scripts'/name).read_bytes()
     result['/opt/privacy-bridge/local-model.json']=(root/'backend/local-model.json').read_bytes()
     for name in ('guest_rpc.py','guest_health.py','acceptance_guest.py','guest_skill.md'):

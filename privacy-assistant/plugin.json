@@ -1,6 +1,6 @@
 {
   "name": "privacy-assistant",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "隐私保护Skill：在本地后台完成表格处理与文档摘要，原件和结果正文不交给云端模型。",
   "extensions": {
     "com.openai": {
