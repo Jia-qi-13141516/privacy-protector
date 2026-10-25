@@ -1,0 +1,41 @@
+name: Platform isolation tests
+on:
+  push:
+    branches: [codex/platform-installation]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: platform-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  windows-kernel:
+    runs-on: windows-2025
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install pywin32==311
+      - run: python -B -m unittest discover -s tests/protector -p 'test_*.py' -v
+      - shell: pwsh
+        run: ./tests/protector/run_windows_probe.ps1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: windows-kernel-results
+          path: |
+            ${{ runner.temp }}/windows-native.json
+            ${{ runner.temp }}/windows-probe.log
+          retention-days: 7
+  mac-compile:
+    runs-on: macos-14
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -B -m unittest discover -s tests/protector -p 'test_*.py' -v
+      - run: swiftc -o /tmp/PrivacyProtectorUI privacy-assistant/protector/macos_ui.swift
